@@ -66,15 +66,19 @@ class ActParser(object):
 class ArcParser(object):
     '''Base class to parse an ARC race result'''
 
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
+        pass
 
-    @classmethod
     def parse(self, content, estropada, estropada_id=0):
         '''Parse a result and return an estropada object'''
-        document = lxml.html.fromstring(content)
-        tandas = document.cssselect('table.tanda')
-        estropada = Estropada(estropada, estropada_id)
+        self.document = lxml.html.fromstring(content)
+        self.estropada = Estropada(estropada, estropada_id)
+        self.parse_tandas()
+        self.parse_resume()
+        return self.estropada
+
+    def parse_tandas(self):
+        tandas = self.document.cssselect('table.tanda')
         for num, text in enumerate(tandas):
             rows = text.findall('.//tbody//tr')
             for kalea, row in enumerate(rows):
@@ -83,19 +87,20 @@ class ArcParser(object):
                 emaitza = TaldeEmaitza(talde_izena=taldea.text.strip(),
                                        kalea=kalea + 1, ziabogak=data[1:4],
                                        denbora=data[4], tanda=num + 1)
-                estropada.taldeak_add(emaitza)
+                self.estropada.taldeak_add(emaitza)
 
-        sailkapena = document.find_class('clasificacion-regata')
+
+    def parse_resume(self):
+        sailkapena = self.document.find_class('clasificacion-regata')
         rows = sailkapena[0].findall('.//tbody//tr')
         tanda_posizioak = [0] + [1] * 5
-
         for pos, row in enumerate(rows):
             taldea = row.find('.//span//a').text.strip()
             try:
                 puntuak = row.find('.//td[3]').text.strip()
             except:
                 puntuak = 0
-            for t in estropada.taldeak:
+            for t in self.estropada.taldeak:
                 if t.talde_izena == taldea:
                     try:
                         t.posizioa = pos + 1
@@ -106,7 +111,6 @@ class ArcParser(object):
                         t.tanda_postua = tanda_posizioak[t.tanda]
                         t.puntuazioa = 0
                     tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
-        return estropada
 
 
 class EuskotrenParser(object):
@@ -159,4 +163,4 @@ class EstropadakParser(object):
         if league == 'act':
             return ActParser()
         else:
-            return cls.parsers[league]
+            return cls.parsers[league]()
