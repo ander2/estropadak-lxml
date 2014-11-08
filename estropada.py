@@ -1,12 +1,13 @@
-#coding: utf-8
+# coding=utf-8
 import sys
 import json
 
 
 class Encoder(json.JSONEncoder):
-    
+
     def default(self, o):
         return o.__dict__
+
 
 class Estropada(object):
     ''' Base class to store a boat race info and result '''
@@ -71,15 +72,16 @@ class Estropada(object):
     def dump_text(self):
         print self.__izena
         print '{0:^6}\t{1:^5}\t{2:^5}\t{3:^30}\t{4:^25}\t{5:^8}'.format(
-                'Postua', 'Tanda', 'Kalea', 'Taldea', 'Ziabogak', 'Denbora')
+              'Postua', 'Tanda', 'Kalea', 'Taldea', 'Ziabogak', 'Denbora')
         for talde in sorted(self.__taldeak, key=lambda x: x.posizioa):
             print u'{0:<6}\t{1:^5}\t{2:^5}\t{3:<30}\t{4:<25}\t{5:<8}'.format(
-                    str(talde.posizioa), talde.tanda, talde.kalea,
-                    talde.talde_izena, u'\t'.join(talde.ziabogak),
-                    talde.denbora)
+                  str(talde.posizioa), talde.tanda, talde.kalea,
+                  talde.talde_izena, u'\t'.join(talde.ziabogak),
+                  talde.denbora)
 
     def dump_json(self):
-        print json.dumps(self, default=self.format_for_json, cls=Encoder, indent=4)
+        print json.dumps(self, default=self.format_for_json,
+                         cls=Encoder, indent=4)
 
     def format_for_json(self, o):
         if isinstance(o, Estropada):
