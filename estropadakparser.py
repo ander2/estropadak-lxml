@@ -1,4 +1,4 @@
-#coding utf-8
+# coding=utf-8
 import lxml.html
 import re
 from estropada import Estropada, TaldeEmaitza
@@ -37,8 +37,9 @@ class ActParser(object):
                 data = [x.text for x in row.findall('.//td')]
                 kalea = int(data[0])
                 emaitza = TaldeEmaitza(talde_izena=data[1].strip(),
-                        kalea=kalea, ziabogak=data[2:5], denbora=data[5],
-                        tanda=num + 1, tanda_postua=data[6], posizioa=0)
+                                       kalea=kalea, ziabogak=data[2:5],
+                                       denbora=data[5], tanda=num + 1,
+                                       tanda_postua=data[6], posizioa=0)
                 self.estropada.taldeak_add(emaitza)
 
     def parse_resume(self):
@@ -89,7 +90,6 @@ class ArcParser(object):
                                        denbora=data[4], tanda=num + 1)
                 self.estropada.taldeak_add(emaitza)
 
-
     def parse_resume(self):
         sailkapena = self.document.find_class('clasificacion-regata')
         rows = sailkapena[0].findall('.//tbody//tr')
@@ -116,41 +116,49 @@ class ArcParser(object):
 class EuskotrenParser(object):
     '''Base class to parse an Euskotren race result'''
 
-    def __init__(self, url):
-        self.url = url
+    def __init__(self):
+        pass
 
-    @classmethod
     def parse(self, content, estropada, estropada_id=0):
         '''Parse a result and return an estropada object'''
-        document = lxml.html.fromstring(content)
-        tandas = document.find_class('tabla_2')
-        estropada = Estropada(estropada, estropada_id)
-        for num, text in enumerate(tandas):
-            rows = text.findall('.//tbody//tr')
-            for row in rows:
-                data = [x.text for x in row.findall('.//td')]
-                team = data[1].strip()
-                ziabogak = map(lambda s: s or '', data[2:5])
-                emaitza = TaldeEmaitza(talde_izena=team,
-                        kalea=data[0], ziabogak=ziabogak, denbora=data[5],
-                        tanda=num + 1, tanda_postua=data[6], posizioa=0)
-                estropada.taldeak_add(emaitza)
-        sailkapena = document.find_class('tabla')
+        self.document = lxml.html.fromstring(content)
+        self.estropada = Estropada(estropada, estropada_id)
+        self.numberOfHeats = self.document.find_class('tabla_2')
+        self.parse_tandas()
+        self.parse_resume()
+        return self.estropada
+
+    def parse_tandas(self):
+        for num, heat in enumerate(self.numberOfHeats):
+            results = heat.findall('.//tbody//tr')
+            for result in results:
+                resultData = [x.text for x in result.findall('.//td')]
+                teamName = resultData[1].strip()
+                ziabogak = map(lambda s: s or '', resultData[2:5])
+                teamResult = TaldeEmaitza(talde_izena=teamName,
+                                          kalea=int(resultData[0]),
+                                          ziabogak=ziabogak,
+                                          denbora=resultData[5], tanda=num + 1,
+                                          tanda_postua=resultData[6],
+                                          posizioa=0)
+                self.estropada.taldeak_add(teamResult)
+
+    def parse_resume(self):
+        sailkapena = self.document.find_class('tabla')
         rows = sailkapena[0].findall('.//tbody//tr')
 
         for row in rows:
-            pos = row.find('.//td[1]//span').text.strip()
-            team = row.find('.//td[2]').text.strip()
+            position = row.find('.//td[1]//span').text.strip()
+            teamName = row.find('.//td[2]').text.strip()
             puntuazioa = row.find('.//td[7]').text.strip()
-            for t in estropada.taldeak:
-                if t.talde_izena == team:
+            for t in self.estropada.taldeak:
+                if t.talde_izena == teamName:
                     try:
-                        t.posizioa = int(pos)
+                        t.posizioa = int(position)
                         t.puntuazioa = int(puntuazioa)
                     except:
                         print "Errorea"
                         t.posizioa = 1
-        return estropada
 
 
 class EstropadakParser(object):
@@ -160,7 +168,4 @@ class EstropadakParser(object):
                EuskotrenParser}
 
     def __new__(cls, league):
-        if league == 'act':
-            return ActParser()
-        else:
-            return cls.parsers[league]()
+        return cls.parsers[league]()
