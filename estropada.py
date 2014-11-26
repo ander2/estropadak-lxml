@@ -83,6 +83,10 @@ class Estropada(object):
         print json.dumps(self, default=self.format_for_json,
                          cls=Encoder, indent=4)
 
+    def get_json(self):
+        return json.dumps(self, default=self.format_for_json,
+                         cls=Encoder, indent=4)
+
     def format_for_json(self, o):
         if isinstance(o, Estropada):
             return dict(izena=o.__izena, sailkapena=o.__taldeak)
