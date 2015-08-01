@@ -14,8 +14,12 @@ class ActParser(object):
     def parse(self, content, estropada, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
-        estropadaName = self.parse_headings()
+        (estropadaName, estropadaDate) = self.parse_headings()
         self.estropada = Estropada(estropadaName, estropada_id)
+        print estropadaDate
+        print estropadaName
+        self.estropada.mydate = estropadaDate
+        self.estropada.liga = 'ACT'
         self.parse_tandas()
         self.parse_resume()
         return self.estropada
@@ -24,9 +28,10 @@ class ActParser(object):
         '''Parse headings table'''
         heading_three = self.document.cssselect('h3')
         name = heading_three[0].text.strip()
-        heading = re.search('([^\(]*?)(\([^\)]*?\))', name)
+        heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
         estropada = heading.group(1).strip()
-        return estropada
+        data = heading.group(2)
+        return (estropada, data)
 
     def parse_tandas(self):
         '''Parse race's paces tables'''
@@ -73,10 +78,34 @@ class ArcParser(object):
     def parse(self, content, estropada, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
-        self.estropada = Estropada(estropada, estropada_id)
+        (estropadaName, estropadaDate) = self.parse_headings()
+        self.estropada = Estropada(estropadaName, estropada_id)
+        self.estropada.mydate = estropadaDate
+        self.estropada.liga = 'ARC'
         self.parse_tandas()
         self.parse_resume()
         return self.estropada
+
+    def parse_headings(self):
+        '''Parse headings table'''
+        heading_two = self.document.cssselect('.resultado h2')
+        estropada = heading_two[0].text.strip()
+        date_block = self.document.cssselect('li.fecha')
+        hour_block =  self.document.cssselect('li.hora')
+        date = date_block[0].text_content().strip(" \n").replace('Fecha', '').strip(" \n")
+        new_date = self.parse_date(date)
+        hour = hour_block[0].text_content().replace('Hora', '').strip()
+        race_date = new_date + " " + hour
+        return (estropada, race_date)
+
+    def parse_date(self, date):
+        new_date = date.replace('Jun', '06')
+        new_date = new_date.replace('Jul', '07')
+        new_date = new_date.replace('Ago', '08')
+        new_date = new_date.replace('Sept', '09')
+        date_list = re.split(' ', new_date)
+        new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
+        return new_date
 
     def parse_tandas(self):
         tandas = self.document.cssselect('table.tanda')
