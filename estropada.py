@@ -15,7 +15,8 @@ class Estropada(object):
     def __init__(self, izena, estropada_id):
         self.__taldeak = []
         self.__izena = izena
-        self.__data = ''
+        self.__mydate = ''
+        self.__liga = ''
         self.__lekua = ''
         self.__urla = ''
         self.__estropada_id = estropada_id
@@ -46,12 +47,20 @@ class Estropada(object):
         self.__oharrak = oharra
 
     @property
-    def data(self):
-        return self.__data
+    def mydate(self):
+        return self.__mydate
 
-    @data.setter
-    def data(self, data):
-        self.__data = data
+    @mydate.setter
+    def mydate(self, mydata):
+        self.__mydate = mydata
+
+    @property
+    def liga(self):
+        return self.__liga
+
+    @liga.setter
+    def liga(self, liga):
+        self.__liga = liga
 
     @property
     def lekua(self):
@@ -85,11 +94,12 @@ class Estropada(object):
 
     def get_json(self):
         return json.dumps(self, default=self.format_for_json,
-                         cls=Encoder, indent=4)
+                          cls=Encoder, indent=4)
 
     def format_for_json(self, o):
         if isinstance(o, Estropada):
-            return dict(izena=o.__izena, sailkapena=o.__taldeak)
+            return dict(izena=o.__izena, data=o.__mydate, liga=o.__liga,
+                        sailkapena=o.__taldeak)
         else:
             return o.__dict__
 
