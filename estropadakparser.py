@@ -122,7 +122,7 @@ class ArcParser(object):
     def parse_resume(self):
         sailkapena = self.document.find_class('clasificacion-regata')
         rows = sailkapena[0].findall('.//tbody//tr')
-        tanda_posizioak = [0] + [1] * 5
+        tanda_posizioak = [0] + [1] * 7
         for pos, row in enumerate(rows):
             taldea = row.find('.//span//a').text.strip()
             try:
@@ -141,6 +141,75 @@ class ArcParser(object):
                         t.puntuazioa = 0
                     tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
 
+class ArcParserLegacy(object):
+    '''Base class to parse an ARC legacy(2006-2008) race result'''
+
+    def __init__(self):
+        pass
+
+    def parse(self, content, estropada, estropadaDate):
+        '''Parse a result and return an estropada object'''
+        self.document = lxml.html.fromstring(content)
+        (estropadaName) = self.parse_headings()
+        estropada_id = 0
+        self.estropada = Estropada(estropadaName, estropada_id)
+        self.estropada.mydate = self.parse_date(estropadaDate)
+        self.estropada.liga = 'ARC'
+        self.parse_tandas()
+        self.parse_resume()
+        return self.estropada
+
+    def parse_headings(self):
+        '''Parse headings table'''
+        heading_one = self.document.cssselect('#contenido h1')
+        estropada = heading_one[0].text.strip()
+        estropada = estropada.replace("Resultados de: ", "")
+        return (estropada)
+
+    def parse_date(self, date):
+        new_date = date.replace('Jun', '06')
+        new_date = new_date.replace('Jul', '07')
+        new_date = new_date.replace('Ago', '08')
+        new_date = new_date.replace('Sept', '09')
+        date_list = re.split('-', new_date)
+        new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
+        return new_date
+
+    def parse_tandas(self):
+        tandas = self.document.cssselect('table.resultados')
+        for num, text in enumerate(tandas):
+            rows = text.findall('.//tr')
+            for kalea, row in enumerate(rows):
+                if kalea == 0:
+                    continue
+                data = [x.text for x in row.findall('.//td')]
+                print data
+                emaitza = TaldeEmaitza(talde_izena=data[1],
+                                       kalea=kalea + 1, ziabogak=data[2:5],
+                                       denbora=data[5], tanda=num + 1)
+                self.estropada.taldeak_add(emaitza)
+
+    def parse_resume(self):
+        sailkapena = self.document.cssselect('#resultado table')
+        rows = sailkapena[0].findall('.//tbody//tr')
+        tanda_posizioak = [0] + [1] * 7
+        for pos, row in enumerate(rows):
+            taldea = row.find('.//span//a').text.strip()
+            try:
+                puntuak = row.find('.//td[3]').text.strip()
+            except:
+                puntuak = 0
+            for t in self.estropada.taldeak:
+                if t.talde_izena == taldea:
+                    try:
+                        t.posizioa = pos + 1
+                        t.tanda_postua = tanda_posizioak[t.tanda]
+                        t.puntuazioa = int(puntuak)
+                    except:
+                        t.posizioa = 1
+                        t.tanda_postua = tanda_posizioak[t.tanda]
+                        t.puntuazioa = 0
+                    tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
 
 class EuskotrenParser(object):
     '''Base class to parse an Euskotren race result'''
@@ -194,7 +263,7 @@ class EstropadakParser(object):
     '''Factory class that returns the right parser
     based on the league name '''
     parsers = {'act': ActParser, 'arc': ArcParser, 'euskotren':
-               EuskotrenParser}
+            EuskotrenParser, 'arc-legacy': ArcParserLegacy}
 
     def __new__(cls, league):
         return cls.parsers[league]()
