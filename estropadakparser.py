@@ -190,26 +190,32 @@ class ArcParserLegacy(object):
                 self.estropada.taldeak_add(emaitza)
 
     def parse_resume(self):
-        sailkapena = self.document.cssselect('#resultado table')
-        rows = sailkapena[0].findall('.//tbody//tr')
+        sailkapenak = self.document.cssselect('#resultado table')
+        tandaKopurua = len(sailkapenak)
+        rows = sailkapenak[tandaKopurua-1].findall('.//tr')
         tanda_posizioak = [0] + [1] * 7
         for pos, row in enumerate(rows):
-            taldea = row.find('.//span//a').text.strip()
+            if pos == 0:
+                continue
             try:
-                puntuak = row.find('.//td[3]').text.strip()
+                taldea = row.find('.//td[2]').text.strip()
+                posizia = row.find('.//td[1]').text.strip()
+                puntuak = row.find('.//td[4]').text.strip()
+                for t in self.estropada.taldeak:
+                    if t.talde_izena == taldea:
+                        try:
+                            t.posizioa = posizioa
+                            t.tanda_postua = tanda_posizioak[t.tanda]
+                            t.puntuazioa = int(puntuak)
+                        except:
+                            t.posizioa = 1
+                            t.tanda_postua = tanda_posizioak[t.tanda]
+                            t.puntuazioa = 0
+                        tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
             except:
-                puntuak = 0
-            for t in self.estropada.taldeak:
-                if t.talde_izena == taldea:
-                    try:
-                        t.posizioa = pos + 1
-                        t.tanda_postua = tanda_posizioak[t.tanda]
-                        t.puntuazioa = int(puntuak)
-                    except:
-                        t.posizioa = 1
-                        t.tanda_postua = tanda_posizioak[t.tanda]
-                        t.puntuazioa = 0
-                    tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
+                e = sys.exc_info()[0]
+                print "Error parsing results"
+                raise ValueError('Error parsing results')
 
 class EuskotrenParser(object):
     '''Base class to parse an Euskotren race result'''
@@ -267,3 +273,17 @@ class EstropadakParser(object):
 
     def __new__(cls, league):
         return cls.parsers[league]()
+
+
+class ActEgutegiaParser(object):
+    '''Base class to parse the ACT calendar'''
+
+    def __init__(self):
+        self.document = ''
+        self.estropada = None
+
+    def parse(self, content):
+        self.document = lxml.html.fromstring(content)
+        links = self.document.cssselect('.race_name a')
+        for num, anchor in enumerate(links):
+            print "http://ligasanmiguel.com/" + anchor.attrib['href']
