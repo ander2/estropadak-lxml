@@ -16,8 +16,8 @@ class ActParser(object):
         self.document = lxml.html.fromstring(content)
         (estropadaName, estropadaDate) = self.parse_headings()
         self.estropada = Estropada(estropadaName, estropada_id)
-        print estropadaDate
-        print estropadaName
+        print(estropadaDate)
+        print(estropadaName)
         self.estropada.mydate = estropadaDate
         self.estropada.liga = 'ACT'
         self.parse_tandas()
@@ -65,7 +65,7 @@ class ActParser(object):
                         taldea.posizioa = int(posizioa)
                         taldea.puntuazioa = int(puntuak)
                     except:
-                        print "Errorea"
+                        print("Errorea")
                         taldea.posizioa = 1
 
 
@@ -75,13 +75,13 @@ class ArcParser(object):
     def __init__(self):
         pass
 
-    def parse(self, content, estropada, estropada_id=0):
+    def parse(self, content, estropada, liga='ARC1'):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
         (estropadaName, estropadaDate) = self.parse_headings()
-        self.estropada = Estropada(estropadaName, estropada_id)
+        self.estropada = Estropada(estropadaName, 0)
         self.estropada.mydate = estropadaDate
-        self.estropada.liga = 'ARC'
+        self.estropada.liga = liga
         self.parse_tandas()
         self.parse_resume()
         return self.estropada
@@ -172,7 +172,8 @@ class ArcParserLegacy(object):
         new_date = new_date.replace('Ago', '08')
         new_date = new_date.replace('Sept', '09')
         date_list = re.split('-', new_date)
-        new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
+        if len(date_list) == 3:
+            new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
         return new_date
 
     def parse_tandas(self):
@@ -183,11 +184,15 @@ class ArcParserLegacy(object):
                 if kalea == 0:
                     continue
                 data = [x.text for x in row.findall('.//td')]
-                print data
-                emaitza = TaldeEmaitza(talde_izena=data[1],
-                                       kalea=kalea + 1, ziabogak=data[2:5],
-                                       denbora=data[5], tanda=num + 1)
-                self.estropada.taldeak_add(emaitza)
+                try:
+                    posizioa = int(data[6])
+                    emaitza = TaldeEmaitza(talde_izena=data[1],
+                                           kalea=kalea, ziabogak=data[2:5],
+                                           denbora=data[5], tanda=num + 1,
+                                           posizioa=posizioa)
+                    self.estropada.taldeak_add(emaitza)
+                except TypeError as e:
+                    print(e)
 
     def parse_resume(self):
         sailkapenak = self.document.cssselect('#resultado table')
@@ -199,22 +204,23 @@ class ArcParserLegacy(object):
                 continue
             try:
                 taldea = row.find('.//td[2]').text.strip()
-                posizia = row.find('.//td[1]').text.strip()
+                posizioa = row.find('.//td[1]').text.strip()
                 puntuak = row.find('.//td[4]').text.strip()
                 for t in self.estropada.taldeak:
-                    if t.talde_izena == taldea:
+                    if re.match(t.talde_izena, taldea, re.I):
                         try:
                             t.posizioa = posizioa
                             t.tanda_postua = tanda_posizioak[t.tanda]
                             t.puntuazioa = int(puntuak)
-                        except:
+                        except Exception as e:
+                            print(e)
                             t.posizioa = 1
                             t.tanda_postua = tanda_posizioak[t.tanda]
                             t.puntuazioa = 0
                         tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
-            except:
-                e = sys.exc_info()[0]
-                print "Error parsing results"
+            except Exception as e:
+                print("Error parsing results")
+                print(e)
                 raise ValueError('Error parsing results')
 
 class EuskotrenParser(object):
@@ -261,7 +267,7 @@ class EuskotrenParser(object):
                         t.posizioa = int(position)
                         t.puntuazioa = int(puntuazioa)
                     except:
-                        print "Errorea"
+                        print("Errorea")
                         t.posizioa = 1
 
 
@@ -286,4 +292,22 @@ class ActEgutegiaParser(object):
         self.document = lxml.html.fromstring(content)
         links = self.document.cssselect('.race_name a')
         for num, anchor in enumerate(links):
-            print "http://ligasanmiguel.com/" + anchor.attrib['href']
+            print("http://ligasanmiguel.com/" + anchor.attrib['href'])
+
+class ArcEgutegiaParser(object):
+    '''Base class to parse the ARC1/ARC2 calendar'''
+
+    def __init__(self, liga):
+        self.document = ''
+        self.estropada = None
+        self.liga = liga
+
+    def parse(self, content):
+        self.document = lxml.html.fromstring(content)
+        if self.liga == 'ARC1':
+            selector = '.tab-item.g1 .regata a'
+        else:
+            selector = '.tab-item.g2 .regata a'
+        links = self.document.cssselect(selector)
+        for num, anchor in enumerate(links):
+            print(anchor.attrib['href'])
