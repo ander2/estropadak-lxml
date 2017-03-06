@@ -1,7 +1,7 @@
 # coding=utf-8
 import lxml.html
 import re
-from estropada import Estropada, TaldeEmaitza
+from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
 
 class ActParser(object):
@@ -147,14 +147,14 @@ class ArcParserLegacy(object):
     def __init__(self):
         pass
 
-    def parse(self, content, estropada, estropadaDate):
+    def parse(self, content, liga, estropadaDate):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
         (estropadaName) = self.parse_headings()
         estropada_id = 0
         self.estropada = Estropada(estropadaName, estropada_id)
         self.estropada.mydate = self.parse_date(estropadaDate)
-        self.estropada.liga = 'ARC'
+        self.estropada.liga = liga
         self.parse_tandas()
         self.parse_resume()
         return self.estropada
@@ -204,7 +204,7 @@ class ArcParserLegacy(object):
                 continue
             try:
                 taldea = row.find('.//td[2]').text.strip()
-                posizioa = row.find('.//td[1]').text.strip()
+                posizioa = int(row.find('.//td[1]').text.strip())
                 puntuak = row.find('.//td[4]').text.strip()
                 for t in self.estropada.taldeak:
                     if re.match(t.talde_izena, taldea, re.I):
