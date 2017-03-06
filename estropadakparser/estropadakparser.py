@@ -185,12 +185,11 @@ class ArcParserLegacy(object):
                     continue
                 data = [x.text for x in row.findall('.//td')]
                 try:
-                    posizioa = int(data[6])
-                    emaitza = TaldeEmaitza(talde_izena=data[1],
-                                           kalea=kalea, ziabogak=data[2:5],
-                                           denbora=data[5], tanda=num + 1,
-                                           posizioa=posizioa)
-                    self.estropada.taldeak_add(emaitza)
+                    if not data[1] is None:
+                        emaitza = TaldeEmaitza(talde_izena=data[1],
+                                               kalea=kalea, ziabogak=data[2:5],
+                                               denbora=data[5], tanda=num + 1)
+                        self.estropada.taldeak_add(emaitza)
                 except TypeError as e:
                     print(e)
 
@@ -220,8 +219,8 @@ class ArcParserLegacy(object):
                         tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
             except Exception as e:
                 print("Error parsing results")
+                print(self.estropada.izena)
                 print(e)
-                raise ValueError('Error parsing results')
 
 class EuskotrenParser(object):
     '''Base class to parse an Euskotren race result'''
