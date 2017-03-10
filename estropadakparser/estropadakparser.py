@@ -153,7 +153,7 @@ class ArcParserLegacy(object):
         (estropadaName) = self.parse_headings()
         estropada_id = 0
         self.estropada = Estropada(estropadaName, estropada_id)
-        self.estropada.mydate = self.parse_date(estropadaDate)
+        self.estropada.mydate = estropadaDate
         self.estropada.liga = liga
         self.parse_tandas()
         self.parse_resume()
