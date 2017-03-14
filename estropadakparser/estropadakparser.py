@@ -1,6 +1,8 @@
 # coding=utf-8
 import lxml.html
 import re
+import logging
+import datetime
 from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
 
@@ -149,14 +151,18 @@ class ArcParserLegacy(object):
 
     def parse(self, content, liga, estropadaDate):
         '''Parse a result and return an estropada object'''
+        d = datetime.datetime.strptime(estropadaDate, '%Y-%m-%d')
         self.document = lxml.html.fromstring(content)
         (estropadaName) = self.parse_headings()
         estropada_id = 0
         self.estropada = Estropada(estropadaName, estropada_id)
         self.estropada.mydate = estropadaDate
         self.estropada.liga = liga
-        self.parse_tandas()
-        self.parse_resume()
+        self.parse_tandas(d.year)
+        if d.year < 2008:
+            self.calculate_tanda_posizioa()
+        else:
+            self.parse_resume()
         return self.estropada
 
     def parse_headings(self):
@@ -176,7 +182,7 @@ class ArcParserLegacy(object):
             new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
         return new_date
 
-    def parse_tandas(self):
+    def parse_tandas(self, urtea):
         tandas = self.document.cssselect('table.resultados')
         for num, text in enumerate(tandas):
             rows = text.findall('.//tr')
@@ -186,12 +192,22 @@ class ArcParserLegacy(object):
                 data = [x.text for x in row.findall('.//td')]
                 try:
                     if not data[1] is None:
+                        if urtea < 2008:
+                            pos = int(data[6])
+                        else:
+                            pos = 0
                         emaitza = TaldeEmaitza(talde_izena=data[1],
                                                kalea=kalea, ziabogak=data[2:5],
-                                               denbora=data[5], tanda=num + 1)
+                                               denbora=data[5], tanda=num + 1, posizioa=pos, tanda_postua=4)
                         self.estropada.taldeak_add(emaitza)
                 except TypeError as e:
                     print(e)
+
+    def calculate_tanda_posizioa(self):
+        tanda_posizioak = [0] + [1] * 7
+        for taldea in sorted(self.estropada.taldeak):
+            taldea.tanda_postua = tanda_posizioak[taldea.tanda]
+            tanda_posizioak[taldea.tanda] = tanda_posizioak[taldea.tanda] + 1
 
     def parse_resume(self):
         sailkapenak = self.document.cssselect('#resultado table')
@@ -203,7 +219,7 @@ class ArcParserLegacy(object):
                 continue
             try:
                 taldea = row.find('.//td[2]').text.strip()
-                posizioa = int(row.find('.//td[1]').text.strip())
+                posizioa = pos - 1
                 puntuak = row.find('.//td[4]').text.strip()
                 for t in self.estropada.taldeak:
                     if re.match(t.talde_izena, taldea, re.I):
@@ -218,9 +234,8 @@ class ArcParserLegacy(object):
                             t.puntuazioa = 0
                         tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
             except Exception as e:
-                print("Error parsing results")
-                print(self.estropada.izena)
-                print(e)
+                logging.warn(self.estropada.izena)
+                logging.info("Error parsing results", exec_info=True)
 
 class EuskotrenParser(object):
     '''Base class to parse an Euskotren race result'''
