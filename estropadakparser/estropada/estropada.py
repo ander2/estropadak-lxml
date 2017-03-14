@@ -23,6 +23,15 @@ class Estropada(object):
         self.__oharrak = ''
         self.version = sys.version_info[1]
 
+    def __gt__(self, other):
+        return self.__my_date > other.__my_date
+
+    def __lt__(self, other):
+        return self.__my_date < other.__my_date
+
+    def __repr__(self):
+        return '{} ({})'.format(self.__izena, self.__mydate)
+
     @property
     def izena(self):
         return self.__izena
@@ -119,4 +128,14 @@ class TaldeEmaitza(object):
         self.ziabogak.append(ziaboga)
 
     def __repr__(self):
-        return '[{}] {}'.format(self.postua, self.talde_izena)
+        # return '[{:2}] {:20} {} '.format(self.posizioa, self.talde_izena)
+        return '[{:2}] {:1} {:1} {:1} {:30} {:25} {:8}'.format(
+                  self.posizioa, self.tanda, self.kalea, self.tanda_postua,
+                  self.talde_izena, ' '.join(self.ziabogak),
+                  self.denbora)
+
+    def __gt__(self, other):
+        return self.posizioa > other.posizioa
+
+    def __lt__(self, other):
+        return self.posizioa < other.posizioa
