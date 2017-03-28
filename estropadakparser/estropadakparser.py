@@ -159,7 +159,7 @@ class ArcParserLegacy(object):
         self.estropada.mydate = estropadaDate
         self.estropada.liga = liga
         self.parse_tandas(d.year)
-        if d.year < 2008:
+        if d.year <= 2008:
             self.calculate_tanda_posizioa()
         else:
             self.parse_resume()
@@ -193,7 +193,12 @@ class ArcParserLegacy(object):
                 try:
                     if not data[1] is None:
                         if urtea < 2008:
-                            pos = int(data[6])
+                            pos = 12
+                            aux = re.sub('[^0-9]', '', data[6])
+                            try:
+                                pos = int(aux)
+                            except ValueError:
+                                pos = 12
                         else:
                             pos = 0
                         emaitza = TaldeEmaitza(talde_izena=data[1],
@@ -205,7 +210,8 @@ class ArcParserLegacy(object):
 
     def calculate_tanda_posizioa(self):
         tanda_posizioak = [0] + [1] * 7
-        for taldea in sorted(self.estropada.taldeak):
+        for pos, taldea in enumerate(sorted(self.estropada.taldeak)):
+            taldea.posizioa = pos + 1
             taldea.tanda_postua = tanda_posizioak[taldea.tanda]
             tanda_posizioak[taldea.tanda] = tanda_posizioak[taldea.tanda] + 1
 
@@ -219,7 +225,8 @@ class ArcParserLegacy(object):
                 continue
             try:
                 taldea = row.find('.//td[2]').text.strip()
-                posizioa = pos - 1
+                posizioa = pos
+                print(posizioa)
                 puntuak = row.find('.//td[4]').text.strip()
                 for t in self.estropada.taldeak:
                     if re.match(t.talde_izena, taldea, re.I):
