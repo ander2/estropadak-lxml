@@ -253,43 +253,64 @@ class EuskotrenParser(object):
     def parse(self, content, estropada, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
-        self.estropada = Estropada(estropada, estropada_id)
+        (estropadaName, estropadaDate) = self.parse_headings()
+        self.estropada = Estropada(estropadaName, estropada_id)
+        self.estropada.mydate = estropadaDate
+        self.estropada.liga = 'euskotren'
         self.numberOfHeats = self.document.find_class('tabla_2')
         self.parse_tandas()
         self.parse_resume()
         return self.estropada
+
+    def parse_headings(self):
+        '''Parse headings table'''
+        heading_three = self.document.cssselect('h3')
+        name = heading_three[0].text_content().strip()
+        heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
+        estropada = heading.group(1).strip()
+        data = heading.group(2)
+        return (estropada, data)
 
     def parse_tandas(self):
         for num, heat in enumerate(self.numberOfHeats):
             results = heat.findall('.//tbody//tr')
             for result in results:
                 resultData = [x.text for x in result.findall('.//td')]
-                teamName = resultData[1].strip()
-                ziabogak = map(lambda s: s or '', resultData[2:5])
-                teamResult = TaldeEmaitza(talde_izena=teamName,
-                                          kalea=int(resultData[0]),
-                                          ziabogak=ziabogak,
-                                          denbora=resultData[5], tanda=num + 1,
-                                          tanda_postua=resultData[6],
-                                          posizioa=0)
-                self.estropada.taldeak_add(teamResult)
+                if resultData[1] != None:
+                    teamName = resultData[1].strip()
+                    #ziabogak = map(lambda s: s or '', resultData[2:5])
+                    ziabogak = [result if result != None else '' for result in resultData[2:5]]
+                    if resultData[5] is None:
+                        denbora = ''
+                    else:
+                        denbora = resultData[5]
+                    teamResult = TaldeEmaitza(talde_izena=teamName,
+                                              kalea=int(resultData[0]),
+                                              ziabogak=ziabogak,
+                                              denbora=denbora, tanda=num + 1,
+                                              tanda_postua=resultData[6],
+                                              posizioa=0)
+                    self.estropada.taldeak_add(teamResult)
 
     def parse_resume(self):
         sailkapena = self.document.find_class('tabla')
-        rows = sailkapena[0].findall('.//tbody//tr')
+        if len(sailkapena) > 0:
+            rows = sailkapena[0].findall('.//tbody//tr')
 
-        for row in rows:
-            position = row.find('.//td[1]//span').text.strip()
-            teamName = row.find('.//td[2]').text.strip()
-            puntuazioa = row.find('.//td[7]').text.strip()
-            for t in self.estropada.taldeak:
-                if t.talde_izena == teamName:
-                    try:
-                        t.posizioa = int(position)
-                        t.puntuazioa = int(puntuazioa)
-                    except:
-                        print("Errorea")
-                        t.posizioa = 1
+            for row in rows:
+                position = row.find('.//td[1]//span').text.strip()
+                teamName = row.find('.//td[2]').text
+                if teamName != None:
+                    teamName = row.find('.//td[2]').text.strip()
+                    puntuazioa = row.find('.//td[7]').text.strip()
+                    for t in self.estropada.taldeak:
+                        if t.talde_izena == teamName:
+                            try:
+                                t.posizioa = int(position)
+                                t.puntuazioa = int(puntuazioa)
+                            except:
+                                print("Errorea")
+                                t.posizioa = 1
 
 
 class EstropadakParser(object):
@@ -332,3 +353,16 @@ class ArcEgutegiaParser(object):
         links = self.document.cssselect(selector)
         for num, anchor in enumerate(links):
             print(anchor.attrib['href'])
+
+class EuskotrenEgutegiaParser(object):
+    '''Base class to parse the Euskotren calendar'''
+
+    def __init__(self):
+        self.document = ''
+        self.estropada = None
+
+    def parse(self, content):
+        self.document = lxml.html.fromstring(content)
+        links = self.document.cssselect('td a')
+        for num, anchor in enumerate(links):
+            print("http://www.ligaact.com" + anchor.attrib['href'])
