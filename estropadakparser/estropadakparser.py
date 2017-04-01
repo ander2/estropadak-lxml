@@ -16,10 +16,11 @@ class ActParser(object):
     def parse(self, content, estropada, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
-        (estropadaName, estropadaDate) = self.parse_headings()
+        (estropadaName, estropadaDate, lekua) = self.parse_headings()
         self.estropada = Estropada(estropadaName, estropada_id)
         print(estropadaDate)
         print(estropadaName)
+        self.estropada.lekua = lekua
         self.estropada.mydate = estropadaDate
         self.estropada.liga = 'ACT'
         self.parse_tandas()
@@ -33,7 +34,11 @@ class ActParser(object):
         heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
         estropada = heading.group(1).strip()
         data = heading.group(2)
-        return (estropada, data)
+        heading_table = self.document.cssselect('table[summary="Regata Puntuable"] td')
+        lekua = ''
+        if heading_table:
+            lekua = heading_table[1].text.strip()
+        return (estropada, data, lekua)
 
     def parse_tandas(self):
         '''Parse race's paces tables'''
