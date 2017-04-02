@@ -1,8 +1,30 @@
 import urllib.request
 import re
-from estropadakparser import EstropadakParser
-from estropada import Estropada
+from estropadakparser.estropadakparser import EstropadakParser
+from estropadakparser.estropada.estropada import Estropada
 
+
+def test_parse_arc():
+    url = 'http://www.euskolabelliga.com/resultados/ver.php?id=eu&r=1084290925'
+    file = urllib.request.urlopen(url)
+    content = file.read()
+    estropada = EstropadakParser('act').parse(content, None)
+    assert isinstance(estropada, Estropada)
+    talde_kopurua = len(estropada.taldeak)
+    assert talde_kopurua == 12
+    assert estropada.lekua == 'Arriluze  Getxo Bizkaia'
+    for taldea in estropada.taldeak:
+        assert type(taldea.posizioa) == int
+        assert taldea.posizioa in range(1, talde_kopurua + 1)
+        assert type(taldea.puntuazioa) == int
+        assert taldea.puntuazioa in range(0, 13)
+        assert type(taldea.kalea) == int
+        assert taldea.kalea in range(1, 5)
+        assert type(taldea.tanda) == int
+        assert taldea.tanda in range(1, 4)
+        for ziab in taldea.ziabogak:
+            assert re.match('\d{1,2}:\d{2}', ziab)
+        assert re.match('\d{2}:\d{2},\d{2}', taldea.denbora)
 
 def test_parse_arc_legacy():
     url = 'http://www.liga-arc.com/historico/resultados_detalle.php?id=123'
@@ -16,8 +38,6 @@ def test_parse_arc_legacy():
     for taldea in estropada.taldeak:
         assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, talde_kopurua + 1)
-        assert type(taldea.puntuazioa) == int
-        assert taldea.puntuazioa in range(0, 13)
         assert type(taldea.kalea) == int
         assert taldea.kalea in range(1, 5)
         assert type(taldea.tanda) == int

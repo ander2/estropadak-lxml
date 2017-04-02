@@ -16,10 +16,11 @@ class ActParser(object):
     def parse(self, content, estropada, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
-        (estropadaName, estropadaDate) = self.parse_headings()
+        (estropadaName, estropadaDate, lekua) = self.parse_headings()
         self.estropada = Estropada(estropadaName, estropada_id)
         print(estropadaDate)
         print(estropadaName)
+        self.estropada.lekua = lekua
         self.estropada.mydate = estropadaDate
         self.estropada.liga = 'ACT'
         self.parse_tandas()
@@ -33,7 +34,11 @@ class ActParser(object):
         heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
         estropada = heading.group(1).strip()
         data = heading.group(2)
-        return (estropada, data)
+        heading_table = self.document.cssselect('table[summary="Regata Puntuable"] td')
+        lekua = ''
+        if heading_table:
+            lekua = heading_table[1].text.strip()
+        return (estropada, data, lekua)
 
     def parse_tandas(self):
         '''Parse race's paces tables'''
@@ -332,9 +337,24 @@ class ActEgutegiaParser(object):
 
     def parse(self, content):
         self.document = lxml.html.fromstring(content)
-        links = self.document.cssselect('.race_name a')
-        for num, anchor in enumerate(links):
-            print("http://ligasanmiguel.com/" + anchor.attrib['href'])
+        table_rows = self.document.cssselect('.taula.tablepadding tr')
+        estropadak = []
+        for i, row in enumerate(table_rows):
+            if i == 0:
+                continue
+            anchor = row.cssselect('.race_name a')
+            izena = anchor[0].text.strip()
+            link = anchor[0].attrib['href']
+            lek_data = row.cssselect('.place')
+            lekua = lek_data[0].text.strip()
+            data = lek_data[1].text.strip()
+            estropada = Estropada(izena, None)
+            estropada.mydate = data
+            estropada.lekua = lekua
+            estropada.href = link
+            estropada.liga = 'ACT'
+            estropadak.append(estropada)
+        return estropadak
 
 class ArcEgutegiaParser(object):
     '''Base class to parse the ARC1/ARC2 calendar'''
