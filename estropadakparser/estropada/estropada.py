@@ -108,7 +108,7 @@ class Estropada(object):
     def format_for_json(self, o):
         if isinstance(o, Estropada):
             return dict(izena=o.__izena, data=o.__mydate, liga=o.__liga,
-                        sailkapena=o.__taldeak)
+                        urla=o.__urla, lekua=o.__lekua, sailkapena=o.__taldeak)
         else:
             return o.__dict__
 
