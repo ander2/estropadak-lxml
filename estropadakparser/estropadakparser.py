@@ -13,7 +13,7 @@ class ActParser(object):
         self.document = ''
         self.estropada = None
 
-    def parse(self, content, estropada, estropada_id=0):
+    def parse(self, content, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
         (estropadaName, estropadaDate, lekua) = self.parse_headings()
@@ -82,13 +82,14 @@ class ArcParser(object):
     def __init__(self):
         pass
 
-    def parse(self, content, estropada, liga='ARC1'):
+    def parse(self, content, estropada_id=0, liga='ARC1'):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
-        (estropadaName, estropadaDate) = self.parse_headings()
+        (estropadaName, estropadaDate, lekua) = self.parse_headings()
         self.estropada = Estropada(estropadaName, 0)
         self.estropada.mydate = estropadaDate
         self.estropada.liga = liga
+        self.estropada.lekua = lekua
         self.parse_tandas()
         self.parse_resume()
         return self.estropada
@@ -99,11 +100,15 @@ class ArcParser(object):
         estropada = heading_two[0].text.strip()
         date_block = self.document.cssselect('li.fecha')
         hour_block =  self.document.cssselect('li.hora')
+        resume_block = self.document.cssselect('.articulo ul li')
+        # Remove map span
+        resume_block[3].cssselect('span')[0].drop_tree()
+        lekua = resume_block[3].text_content().strip()
         date = date_block[0].text_content().strip(" \n").replace('Fecha', '').strip(" \n")
         new_date = self.parse_date(date)
         hour = hour_block[0].text_content().replace('Hora', '').strip()
         race_date = new_date + " " + hour
-        return (estropada, race_date)
+        return (estropada, race_date, lekua)
 
     def parse_date(self, date):
         new_date = date.replace('Jun', '06')
@@ -128,25 +133,26 @@ class ArcParser(object):
 
     def parse_resume(self):
         sailkapena = self.document.find_class('clasificacion-regata')
-        rows = sailkapena[0].findall('.//tbody//tr')
-        tanda_posizioak = [0] + [1] * 7
-        for pos, row in enumerate(rows):
-            taldea = row.find('.//span//a').text.strip()
-            try:
-                puntuak = row.find('.//td[3]').text.strip()
-            except:
-                puntuak = 0
-            for t in self.estropada.taldeak:
-                if t.talde_izena == taldea:
-                    try:
-                        t.posizioa = pos + 1
-                        t.tanda_postua = tanda_posizioak[t.tanda]
-                        t.puntuazioa = int(puntuak)
-                    except:
-                        t.posizioa = 1
-                        t.tanda_postua = tanda_posizioak[t.tanda]
-                        t.puntuazioa = 0
-                    tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
+        if len(sailkapena) > 0:
+            rows = sailkapena[0].findall('.//tbody//tr')
+            tanda_posizioak = [0] + [1] * 7
+            for pos, row in enumerate(rows):
+                taldea = row.find('.//span//a').text.strip()
+                try:
+                    puntuak = row.find('.//td[3]').text.strip()
+                except:
+                    puntuak = 0
+                for t in self.estropada.taldeak:
+                    if t.talde_izena == taldea:
+                        try:
+                            t.posizioa = pos + 1
+                            t.tanda_postua = tanda_posizioak[t.tanda]
+                            t.puntuazioa = int(puntuak)
+                        except:
+                            t.posizioa = 1
+                            t.tanda_postua = tanda_posizioak[t.tanda]
+                            t.puntuazioa = 0
+                        tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
 
 class ArcParserLegacy(object):
     '''Base class to parse an ARC legacy(2006-2008) race result'''
@@ -255,7 +261,7 @@ class EuskotrenParser(object):
     def __init__(self):
         pass
 
-    def parse(self, content, estropada, estropada_id=0):
+    def parse(self, content, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
         (estropadaName, estropadaDate) = self.parse_headings()
@@ -364,15 +370,36 @@ class ArcEgutegiaParser(object):
         self.estropada = None
         self.liga = liga
 
+    def parse_date(self, date):
+        new_date = date.replace('Junio', '06')
+        new_date = new_date.replace('Julio', '07')
+        new_date = new_date.replace('Agosto', '08')
+        new_date = new_date.replace('Septiembre', '09')
+        date_list = re.split(' ', new_date)
+        if len(date_list) == 3:
+            new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
+        return new_date
+
     def parse(self, content):
         self.document = lxml.html.fromstring(content)
         if self.liga == 'ARC1':
-            selector = '.tab-item.g1 .regata a'
+            selector = 'tr.tab-item.g1'
         else:
-            selector = '.tab-item.g2 .regata a'
-        links = self.document.cssselect(selector)
-        for num, anchor in enumerate(links):
-            print(anchor.attrib['href'])
+            selector = 'tr.tab-item.g2'
+        estropadak = []
+        table_rows = self.document.cssselect(selector)
+        for i, row in enumerate(table_rows):
+            anchor = row.cssselect('.regata a')
+            izena = anchor[0].text.strip()
+            link = anchor[0].attrib['href']
+            lek_data = row.cssselect('.fecha span')
+            data = self.parse_date(lek_data[0].text.strip() + ' 2017')
+            estropada = Estropada(izena, None)
+            estropada.mydate = data
+            estropada.href = link
+            estropada.liga = self.liga
+            estropadak.append(estropada)
+        return estropadak
 
 class EuskotrenEgutegiaParser(object):
     '''Base class to parse the Euskotren calendar'''
