@@ -1,0 +1,12 @@
+2007-06-30	http://www.liga-arc.com/historico/resultados_detalle.php?id=131
+2007-07-01	http://www.liga-arc.com/historico/resultados_detalle.php?id=128
+2007-07-08	http://www.liga-arc.com/historico/resultados_detalle.php?id=133
+2007-07-14	http://www.liga-arc.com/historico/resultados_detalle.php?id=135
+2007-07-21	http://www.liga-arc.com/historico/resultados_detalle.php?id=142
+2007-07-22	http://www.liga-arc.com/historico/resultados_detalle.php?id=143
+2007-07-28	http://www.liga-arc.com/historico/resultados_detalle.php?id=149
+2007-07-29	http://www.liga-arc.com/historico/resultados_detalle.php?id=145
+2007-08-04	http://www.liga-arc.com/historico/resultados_detalle.php?id=152
+2007-08-15	http://www.liga-arc.com/historico/resultados_detalle.php?id=153
+2007-08-19	http://www.liga-arc.com/historico/resultados_detalle.php?id=154
+2007-08-26	http://www.liga-arc.com/historico/resultados_detalle.php?id=158
