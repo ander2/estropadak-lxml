@@ -409,7 +409,21 @@ class EuskotrenEgutegiaParser(object):
         self.estropada = None
 
     def parse(self, content):
+        self.liga = 'euskotren'
         self.document = lxml.html.fromstring(content)
-        links = self.document.cssselect('td a')
-        for num, anchor in enumerate(links):
-            print("http://www.ligaact.com" + anchor.attrib['href'])
+        selector = '.tabla_2 tbody tr'
+        estropadak = []
+        table_rows = self.document.cssselect(selector)
+        for i, row in enumerate(table_rows):
+            anchor = row.cssselect('a')
+            izena = anchor[0].text.strip()
+            link = "http://www.ligaact.com" + anchor[0].attrib['href'].replace('calendario', 'resultados')
+            lekua = row.cssselect('td')[2].text.strip()
+            data = row.cssselect('td')[3].text.strip()
+            estropada = Estropada(izena, None)
+            estropada.mydate = data
+            estropada.urla = link
+            estropada.lekua = lekua
+            estropada.liga = self.liga
+            estropadak.append(estropada)
+        return estropadak
