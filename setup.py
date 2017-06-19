@@ -8,5 +8,6 @@ setup(name='EstropadakParser',
       author='Ander Garmendia',
       author_email='kelertxiki@gmail.com',
       url='http://www.estropadak.net',
-      packages=['estropadakparser', 'estropadakparser.estropada']
+      packages=['estropadakparser', 'estropadakparser.estropada'],
+      package_data={'estropadakparser': ['data/*.txt']}
      )
