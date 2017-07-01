@@ -82,10 +82,10 @@ class ArcParser(object):
     def __init__(self):
         pass
 
-    def parse(self, content, estropada_id=0, liga='ARC1'):
+    def parse(self, content, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
-        (estropadaName, estropadaDate, lekua) = self.parse_headings()
+        (estropadaName, estropadaDate, lekua, liga) = self.parse_headings()
         self.estropada = Estropada(estropadaName, 0)
         self.estropada.mydate = estropadaDate
         self.estropada.liga = liga
@@ -96,6 +96,11 @@ class ArcParser(object):
 
     def parse_headings(self):
         '''Parse headings table'''
+        liga_selector = self.document.cssselect('h1.seccion span span')[0].text.lower()
+        if 'grupo 1' in liga_selector:
+            liga_taldea = 'ARC1'
+        else:
+            liga_taldea = 'ARC2'
         heading_two = self.document.cssselect('.resultado h2')
         estropada = heading_two[0].text.strip()
         date_block = self.document.cssselect('li.fecha')
@@ -108,7 +113,7 @@ class ArcParser(object):
         new_date = self.parse_date(date)
         hour = hour_block[0].text_content().replace('Hora', '').strip()
         race_date = new_date + " " + hour
-        return (estropada, race_date, lekua)
+        return (estropada, race_date, lekua, liga_taldea)
 
     def parse_date(self, date):
         new_date = date.replace('Jun', '06')
