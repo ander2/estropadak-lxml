@@ -1,0 +1,13 @@
+2006-07-06	http://www.liga-arc.com/historico/resultados_detalle.php?id=91
+2006-07-23	http://www.liga-arc.com/historico/resultados_detalle.php?id=92
+2006-07-15	http://www.liga-arc.com/historico/resultados_detalle.php?id=90
+2006-07-22	http://www.liga-arc.com/historico/resultados_detalle.php?id=87
+2006-07-29	http://www.liga-arc.com/historico/resultados_detalle.php?id=93
+2006-07-30	http://www.liga-arc.com/historico/resultados_detalle.php?id=85
+2006-08-02	http://www.liga-arc.com/historico/resultados_detalle.php?id=108
+2006-08-05	http://www.liga-arc.com/historico/resultados_detalle.php?id=86
+2006-08-06	http://www.liga-arc.com/historico/resultados_detalle.php?id=89
+2006-08-12	http://www.liga-arc.com/historico/resultados_detalle.php?id=84
+2006-08-15	http://www.liga-arc.com/historico/resultados_detalle.php?id=83
+2006-08-26	http://www.liga-arc.com/historico/resultados_detalle.php?id=94
+2006-08-27	http://www.liga-arc.com/historico/resultados_detalle.php?id=88

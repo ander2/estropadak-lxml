@@ -10,7 +10,7 @@ class Encoder(json.JSONEncoder):
 
 
 class Estropada(object):
-    ''' Base class to store a boat race info and result '''
+    """Base class to store a boat race info and result"""
 
     def __init__(self, izena, estropada_id):
         self.__taldeak = []
@@ -22,6 +22,15 @@ class Estropada(object):
         self.__estropada_id = estropada_id
         self.__oharrak = ''
         self.version = sys.version_info[1]
+
+    def __gt__(self, other):
+        return self.__my_date > other.__my_date
+
+    def __lt__(self, other):
+        return self.__my_date < other.__my_date
+
+    def __repr__(self):
+        return '{} ({})'.format(self.__izena, self.__mydate)
 
     @property
     def izena(self):
@@ -79,18 +88,18 @@ class Estropada(object):
         self.__urla = data
 
     def dump_text(self):
-        print self.__izena
-        print '{0:^6}\t{1:^5}\t{2:^5}\t{3:^30}\t{4:^25}\t{5:^8}'.format(
-              'Postua', 'Tanda', 'Kalea', 'Taldea', 'Ziabogak', 'Denbora')
+        print(self.__izena)
+        print('{0:^6}\t{1:^5}\t{2:^5}\t{3:^30}\t{4:^25}\t{5:^8}'.format(
+              'Postua', 'Tanda', 'Kalea', 'Taldea', 'Ziabogak', 'Denbora'))
         for talde in sorted(self.__taldeak, key=lambda x: x.posizioa):
-            print u'{0:<6}\t{1:^5}\t{2:^5}\t{3:<30}\t{4:<25}\t{5:<8}'.format(
+            print(u'{0:<6}\t{1:^5}\t{2:^5}\t{3:<30}\t{4:<25}\t{5:<8}'.format(
                   str(talde.posizioa), talde.tanda, talde.kalea,
                   talde.talde_izena, u'\t'.join(talde.ziabogak),
-                  talde.denbora)
+                  talde.denbora))
 
     def dump_json(self):
-        print json.dumps(self, default=self.format_for_json,
-                         cls=Encoder, indent=4)
+        print(json.dumps(self, default=self.format_for_json,
+                         cls=Encoder, indent=4))
 
     def get_json(self):
         return json.dumps(self, default=self.format_for_json,
@@ -99,7 +108,7 @@ class Estropada(object):
     def format_for_json(self, o):
         if isinstance(o, Estropada):
             return dict(izena=o.__izena, data=o.__mydate, liga=o.__liga,
-                        sailkapena=o.__taldeak)
+                        urla=o.__urla, lekua=o.__lekua, sailkapena=o.__taldeak)
         else:
             return o.__dict__
 
@@ -111,9 +120,22 @@ class TaldeEmaitza(object):
         self.talde_izena = talde_izena
         self.talde_id = ''
         self.ziabogak = []
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             setattr(self, key, value)
         self.postua = ''
 
     def ziaboga_gehitu(self, ziaboga):
         self.ziabogak.append(ziaboga)
+
+    def __repr__(self):
+        # return '[{:2}] {:20} {} '.format(self.posizioa, self.talde_izena)
+        return '[{:2}] {:1} {:1} {:1} {:30} {:25} {:8}'.format(
+                  self.posizioa, self.tanda, self.kalea, self.tanda_postua,
+                  self.talde_izena, ' '.join(self.ziabogak),
+                  self.denbora)
+
+    def __gt__(self, other):
+        return self.posizioa > other.posizioa
+
+    def __lt__(self, other):
+        return self.posizioa < other.posizioa
