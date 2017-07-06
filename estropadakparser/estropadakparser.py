@@ -57,8 +57,11 @@ class ActParser(object):
     def parse_resume(self):
         '''Parse race's resume table'''
         rank_table = '//table[@summary="Estropadaren sailkapena"]'
-        sailkapena = self.document.xpath(rank_table)
-        rows = sailkapena[-1].findall('.//tbody//tr')
+        try:
+            sailkapena = self.document.xpath(rank_table)
+            rows = sailkapena[-1].findall('.//tbody//tr')
+        except:
+            rows = []
         for num, row in enumerate(rows):
             if num == 0:
                 posizioa = row.find('.//td[1]//span').text.strip()
@@ -362,7 +365,7 @@ class ActEgutegiaParser(object):
             estropada = Estropada(izena, None)
             estropada.mydate = data
             estropada.lekua = lekua
-            estropada.href = link
+            estropada.urla = 'http://www.euskolabelliga.com' + link
             estropada.liga = 'ACT'
             estropadak.append(estropada)
         return estropadak
@@ -394,14 +397,14 @@ class ArcEgutegiaParser(object):
         estropadak = []
         table_rows = self.document.cssselect(selector)
         for i, row in enumerate(table_rows):
-            anchor = row.cssselect('.regata a')
+            anchor = row.cssselect('.race_name a')
             izena = anchor[0].text.strip()
             link = anchor[0].attrib['href']
             lek_data = row.cssselect('.fecha span')
             data = self.parse_date(lek_data[0].text.strip() + ' 2017')
             estropada = Estropada(izena, None)
             estropada.mydate = data
-            estropada.href = link
+            estropada.urla = link
             estropada.liga = self.liga
             estropadak.append(estropada)
         return estropadak
