@@ -9,15 +9,18 @@ from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 class ActParser(object):
     '''Base class to parse an ACT race result'''
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.document = ''
         self.estropada = None
+        if 'urla' in kwargs:
+            self.urla = kwargs['urla']
 
     def parse(self, content, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
         (estropadaName, estropadaDate, lekua) = self.parse_headings()
-        self.estropada = Estropada(estropadaName, estropada_id)
+        opts = {'urla': self.urla, 'estropada_id': estropada_id}
+        self.estropada = Estropada(estropadaName, **opts)
         print(estropadaDate)
         print(estropadaName)
         self.estropada.lekua = lekua
@@ -82,14 +85,17 @@ class ActParser(object):
 class ArcParser(object):
     '''Base class to parse an ARC race result'''
 
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        self.estropada = None
+        if 'urla' in kwargs:
+            self.urla = kwargs['urla']
 
     def parse(self, content, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
         (estropadaName, estropadaDate, lekua, liga) = self.parse_headings()
-        self.estropada = Estropada(estropadaName, 0)
+        opts = {'urla': self.urla, 'estropada_id': estropada_id}
+        self.estropada = Estropada(estropadaName, **opts)
         self.estropada.mydate = estropadaDate
         self.estropada.liga = liga
         self.estropada.lekua = lekua
@@ -165,18 +171,24 @@ class ArcParser(object):
 class ArcParserLegacy(object):
     '''Base class to parse an ARC legacy(2006-2008) race result'''
 
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        if 'urla' in kwargs:
+            self.urla = kwargs['urla']
+        if 'estropadaDate' in kwargs:
+            self.estropadaDate = kwargs['estropadaDate']
+        if 'liga' in kwargs:
+            self.liga = kwargs['liga']
 
-    def parse(self, content, liga, estropadaDate):
+
+    def parse(self, content, estropada_id=0):
         '''Parse a result and return an estropada object'''
-        d = datetime.datetime.strptime(estropadaDate, '%Y-%m-%d')
         self.document = lxml.html.fromstring(content)
+        d = datetime.datetime.strptime(self.estropadaDate, '%Y-%m-%d')
         (estropadaName) = self.parse_headings()
-        estropada_id = 0
-        self.estropada = Estropada(estropadaName, estropada_id)
-        self.estropada.mydate = estropadaDate
-        self.estropada.liga = liga
+        opts = {'urla': self.urla, 'estropada_id': estropada_id}
+        self.estropada = Estropada(estropadaName, **opts)
+        self.estropada.mydate = self.estropadaDate
+        self.estropada.liga = self.liga
         self.parse_tandas(d.year)
         if d.year <= 2008:
             self.calculate_tanda_posizioa()
@@ -266,14 +278,16 @@ class ArcParserLegacy(object):
 class EuskotrenParser(object):
     '''Base class to parse an Euskotren race result'''
 
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        if 'urla' in kwargs:
+            self.urla = kwargs['urla']
 
     def parse(self, content, estropada_id=0):
         '''Parse a result and return an estropada object'''
         self.document = lxml.html.fromstring(content)
         (estropadaName, estropadaDate) = self.parse_headings()
-        self.estropada = Estropada(estropadaName, estropada_id)
+        opts = {'urla': self.urla, 'estropada_id': estropada_id}
+        self.estropada = Estropada(estropadaName, **opts)
         self.estropada.mydate = estropadaDate
         self.estropada.liga = 'euskotren'
         self.numberOfHeats = self.document.find_class('tabla_2')
@@ -338,8 +352,9 @@ class EstropadakParser(object):
     parsers = {'act': ActParser, 'arc': ArcParser, 'euskotren':
             EuskotrenParser, 'arc-legacy': ArcParserLegacy}
 
-    def __new__(cls, league):
-        return cls.parsers[league]()
+    def __new__(cls, league, **kwargs):
+        print("Kwargs: %s" % kwargs)
+        return cls.parsers[league](**kwargs)
 
 
 class ActEgutegiaParser(object):

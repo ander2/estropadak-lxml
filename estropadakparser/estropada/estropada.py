@@ -12,14 +12,18 @@ class Encoder(json.JSONEncoder):
 class Estropada(object):
     """Base class to store a boat race info and result"""
 
-    def __init__(self, izena, estropada_id):
+    def __init__(self, izena, **kwargs):
         self.__taldeak = []
         self.__izena = izena
         self.__mydate = ''
         self.__liga = ''
         self.__lekua = ''
-        self.__urla = ''
-        self.__estropada_id = estropada_id
+        if 'urla' in kwargs:
+            self.__urla = kwargs['urla']
+        if 'estropada_id' in kwargs:
+            self.__estropada_id = kwargs['estropada_id']
+        if 'liga' in kwargs:
+            self.__liga = kwargs['liga']
         self.__oharrak = ''
         self.version = sys.version_info[1]
 
