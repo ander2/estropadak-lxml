@@ -49,14 +49,18 @@ class ActParser(Parser):
     def parse_headings(self, document):
         '''Parse headings table'''
         heading_three = document.cssselect('h3')
-        name = heading_three[0].text.strip()
-        heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
-        estropada = heading.group(1).strip()
-        data = heading.group(2)
+        data = ''
+        if len(heading_three) > 0:
+            name = heading_three[0].text.strip()
+            heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
+            estropada = heading.group(1).strip()
+            data = heading.group(2)
         heading_table = document.cssselect('table[summary="Regata Puntuable"] td')
         lekua = ''
         if heading_table:
             lekua = heading_table[1].text.strip()
+            ordua =  heading_table[3].text.strip().replace('.', ':')
+        data = data + ' ' + ordua
         return (estropada, data, lekua)
 
     def parse_tandas(self, document):
