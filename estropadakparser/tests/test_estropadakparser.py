@@ -9,16 +9,8 @@ from estropadakparser.estropada.estropada import Estropada
 class TestEstropadakParser(unittest.TestCase):
     '''Test class for testing EstropadakParser class'''
     def setUp(self):
-        act_url = ('http://www.ligasanmiguel.com/resultados/'
-                   'ver.php?id=eu&r=1365765288')
-        actRaceResult = urllib.request.urlopen(act_url)
-        self.actRaceHtml = actRaceResult.read()
-        self.actEstropadaName = 'Bandera Euskadi Basque Country'
-        self.estropadaId = 'Id'
         arc1_url = ('http://www.liga-arc.com/es/regata/163/'
                     'xxiii-bandera-ayuntamiento-de-camargo')
-        arc1RaceResult = urllib.request.urlopen(arc1_url)
-        self.arc1RaceHtml = arc1RaceResult.read()
         arc2_url = ('http://www.liga-arc.com/es/regata/172/'
                     'xli-bandera-ciudad-de-castro-vi-mem.-avelino-ibaez')
         arc2RaceResult = urllib.request.urlopen(arc2_url)
@@ -32,7 +24,7 @@ class TestEstropadakParser(unittest.TestCase):
         act_url = ('http://www.ligasanmiguel.com/resultados/'
                    'ver.php?id=eu&r=1365765288')
         kwargs = {'urla': act_url}
-        self.estropada = EstropadakParser('act', **kwargs).parse(self.actRaceHtml, None)
+        self.estropada = EstropadakParser('act').parse(act_url)
         self.assertIsInstance(self.estropada, Estropada, 'Not a estropada')
         self.assertEqual(self.estropada.izena, 'Bandera Euskadi Basque Country')
         self.assertEqual(len(self.estropada.taldeak), 12)
@@ -54,7 +46,7 @@ class TestEstropadakParser(unittest.TestCase):
         arc1_url = ('http://www.liga-arc.com/es/regata/163/'
                     'xxiii-bandera-ayuntamiento-de-camargo')
         kwargs = {'urla': arc1_url}
-        self.estropada = EstropadakParser('arc', **kwargs).parse(self.arc1RaceHtml, None)
+        self.estropada = EstropadakParser('arc').parse(arc1_url)
         self.assertIsInstance(self.estropada, Estropada, 'Not a estropada')
         self.assertIs(self.estropada.liga, 'ARC1')
         assert self.estropada.urla == arc1_url
@@ -75,8 +67,7 @@ class TestEstropadakParser(unittest.TestCase):
     def test_parse_arc2(self):
         arc2_url = ('http://www.liga-arc.com/es/regata/172/'
                     'xli-bandera-ciudad-de-castro-vi-mem.-avelino-ibaez')
-        kwargs = {'urla': arc2_url}
-        self.estropada = EstropadakParser('arc', **kwargs).parse(self.arc2RaceHtml, None)
+        self.estropada = EstropadakParser('arc').parse(arc2_url)
         self.assertIsInstance(self.estropada, Estropada, 'Not a estropada')
         assert self.estropada.urla == arc2_url
         talde_kopurua = len(self.estropada.taldeak)
@@ -95,10 +86,7 @@ class TestEstropadakParser(unittest.TestCase):
 
     def test_parse_arc_legacy(self):
         url = 'http://www.liga-arc.com/historico/resultados_detalle.php?id=123'
-        file = urllib.request.urlopen(url)
-        content = file.read()
-        kwargs = {'urla': url, 'estropadaDate': '2007-06-30', 'liga': 'ARC1'}
-        estropada = EstropadakParser('arc-legacy', **kwargs).parse(content, None)
+        estropada = EstropadakParser('arc-legacy').parse(url, None, '2007-06-30','ARC1')
         assert isinstance(estropada, Estropada)
         talde_kopurua = len(estropada.taldeak)
         assert talde_kopurua == 12
@@ -117,8 +105,7 @@ class TestEstropadakParser(unittest.TestCase):
     def test_euskotren(self):
         euskotren_url = ('http://www.ligasanmiguel.com/femenina/resultados/'
                          'ver.php?id=es&r=1395519778')
-        kwargs = {'urla': euskotren_url}
-        self.estropada = EstropadakParser('euskotren', **kwargs).parse(self.euskotrenRaceHtml, None)
+        self.estropada = EstropadakParser('euskotren').parse(euskotren_url)
         self.assertIsInstance(self.estropada, Estropada, 'Not a estropada')
         assert self.estropada.urla == euskotren_url
         talde_kopurua = len(self.estropada.taldeak)

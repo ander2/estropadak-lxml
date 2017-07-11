@@ -3,49 +3,65 @@ import lxml.html
 import re
 import logging
 import datetime
+import urllib
+
 from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
+class Parser(object):
 
-class ActParser(object):
+    def __init__(self):
+        pass
+
+    def get_content(self, *args):
+        '''Parse a result and return an estropada object'''
+        urla = args[0]
+        if len(args) == 2 and args[1] is not None:
+            document = lxml.html.fromstring(content)
+        else:
+            html_file = urllib.request.urlopen(urla)
+            content = html_file.read()
+            document = lxml.html.fromstring(content)
+        return document
+
+
+class ActParser(Parser):
     '''Base class to parse an ACT race result'''
 
-    def __init__(self, **kwargs):
-        self.document = ''
-        self.estropada = None
-        if 'urla' in kwargs:
-            self.urla = kwargs['urla']
+    def __init__(self):
+        pass
 
-    def parse(self, content, estropada_id=0):
+    def parse(self, *args):
         '''Parse a result and return an estropada object'''
-        self.document = lxml.html.fromstring(content)
-        (estropadaName, estropadaDate, lekua) = self.parse_headings()
-        opts = {'urla': self.urla, 'estropada_id': estropada_id}
+        urla = args[0]
+        document = self.get_content(*args)
+        (estropadaName, estropadaDate, lekua) = self.parse_headings(document)
+        opts = {'urla': urla}
         self.estropada = Estropada(estropadaName, **opts)
         print(estropadaDate)
         print(estropadaName)
         self.estropada.lekua = lekua
         self.estropada.mydate = estropadaDate
         self.estropada.liga = 'ACT'
-        self.parse_tandas()
-        self.parse_resume()
+        self.parse_tandas(document)
+        self.parse_resume(document)
         return self.estropada
 
-    def parse_headings(self):
+    def parse_headings(self, document):
         '''Parse headings table'''
-        heading_three = self.document.cssselect('h3')
+        heading_three = document.cssselect('h3')
         name = heading_three[0].text.strip()
         heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
         estropada = heading.group(1).strip()
         data = heading.group(2)
-        heading_table = self.document.cssselect('table[summary="Regata Puntuable"] td')
+        heading_table = document.cssselect('table[summary="Regata Puntuable"] td')
         lekua = ''
         if heading_table:
             lekua = heading_table[1].text.strip()
         return (estropada, data, lekua)
 
-    def parse_tandas(self):
+    def parse_tandas(self, document):
         '''Parse race's paces tables'''
-        tandas = self.document.find_class('tabla_tanda')
+        tandas = document.find_class('tabla_tanda')
         for num, text in enumerate(tandas):
             rows = text.findall('.//tbody//tr')
             for row in rows:
@@ -57,11 +73,11 @@ class ActParser(object):
                                        tanda_postua=data[6], posizioa=0)
                 self.estropada.taldeak_add(emaitza)
 
-    def parse_resume(self):
+    def parse_resume(self, document):
         '''Parse race's resume table'''
         rank_table = '//table[@summary="Estropadaren sailkapena"]'
         try:
-            sailkapena = self.document.xpath(rank_table)
+            sailkapena = document.xpath(rank_table)
             rows = sailkapena[-1].findall('.//tbody//tr')
         except:
             rows = []
@@ -82,39 +98,38 @@ class ActParser(object):
                         taldea.posizioa = 1
 
 
-class ArcParser(object):
+class ArcParser(Parser):
     '''Base class to parse an ARC race result'''
 
-    def __init__(self, **kwargs):
-        self.estropada = None
-        if 'urla' in kwargs:
-            self.urla = kwargs['urla']
+    def __init__(self):
+        pass
 
-    def parse(self, content, estropada_id=0):
+    def parse(self, *args):
         '''Parse a result and return an estropada object'''
-        self.document = lxml.html.fromstring(content)
-        (estropadaName, estropadaDate, lekua, liga) = self.parse_headings()
-        opts = {'urla': self.urla, 'estropada_id': estropada_id}
+        urla = args[0]
+        document = self.get_content(*args)
+        (estropadaName, estropadaDate, lekua, liga) = self.parse_headings(document)
+        opts = {'urla': urla}
         self.estropada = Estropada(estropadaName, **opts)
         self.estropada.mydate = estropadaDate
         self.estropada.liga = liga
         self.estropada.lekua = lekua
-        self.parse_tandas()
-        self.parse_resume()
+        self.parse_tandas(document)
+        self.parse_resume(document)
         return self.estropada
 
-    def parse_headings(self):
+    def parse_headings(self, document):
         '''Parse headings table'''
-        liga_selector = self.document.cssselect('h1.seccion span span')[0].text.lower()
+        liga_selector = document.cssselect('h1.seccion span span')[0].text.lower()
         if 'grupo 1' in liga_selector:
             liga_taldea = 'ARC1'
         else:
             liga_taldea = 'ARC2'
-        heading_two = self.document.cssselect('.resultado h2')
+        heading_two = document.cssselect('.resultado h2')
         estropada = heading_two[0].text.strip()
-        date_block = self.document.cssselect('li.fecha')
-        hour_block =  self.document.cssselect('li.hora')
-        resume_block = self.document.cssselect('.articulo ul li')
+        date_block = document.cssselect('li.fecha')
+        hour_block =  document.cssselect('li.hora')
+        resume_block = document.cssselect('.articulo ul li')
         # Remove map span
         resume_block[3].cssselect('span')[0].drop_tree()
         lekua = resume_block[3].text_content().strip()
@@ -133,8 +148,8 @@ class ArcParser(object):
         new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
         return new_date
 
-    def parse_tandas(self):
-        tandas = self.document.cssselect('table.tanda')
+    def parse_tandas(self, document):
+        tandas = document.cssselect('table.tanda')
         for num, text in enumerate(tandas):
             rows = text.findall('.//tbody//tr')
             for kalea, row in enumerate(rows):
@@ -145,8 +160,8 @@ class ArcParser(object):
                                        denbora=data[4], tanda=num + 1)
                 self.estropada.taldeak_add(emaitza)
 
-    def parse_resume(self):
-        sailkapena = self.document.find_class('clasificacion-regata')
+    def parse_resume(self, document):
+        sailkapena = document.find_class('clasificacion-regata')
         if len(sailkapena) > 0:
             rows = sailkapena[0].findall('.//tbody//tr')
             tanda_posizioak = [0] + [1] * 7
@@ -168,37 +183,35 @@ class ArcParser(object):
                             t.puntuazioa = 0
                         tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
 
-class ArcParserLegacy(object):
+class ArcParserLegacy(Parser):
     '''Base class to parse an ARC legacy(2006-2008) race result'''
 
     def __init__(self, **kwargs):
-        if 'urla' in kwargs:
-            self.urla = kwargs['urla']
-        if 'estropadaDate' in kwargs:
-            self.estropadaDate = kwargs['estropadaDate']
-        if 'liga' in kwargs:
-            self.liga = kwargs['liga']
+        pass
 
 
-    def parse(self, content, estropada_id=0):
+    def parse(self, *args):
         '''Parse a result and return an estropada object'''
-        self.document = lxml.html.fromstring(content)
-        d = datetime.datetime.strptime(self.estropadaDate, '%Y-%m-%d')
-        (estropadaName) = self.parse_headings()
-        opts = {'urla': self.urla, 'estropada_id': estropada_id}
+        document = self.get_content(*args)
+        urla = args[0]
+        estropadaDate = args[2]
+        liga = args[3]
+        d = datetime.datetime.strptime(estropadaDate, '%Y-%m-%d')
+        (estropadaName) = self.parse_headings(document)
+        opts = {'urla': urla}
         self.estropada = Estropada(estropadaName, **opts)
-        self.estropada.mydate = self.estropadaDate
-        self.estropada.liga = self.liga
-        self.parse_tandas(d.year)
+        self.estropada.mydate = estropadaDate
+        self.estropada.liga = liga
+        self.parse_tandas(document, d.year)
         if d.year <= 2008:
             self.calculate_tanda_posizioa()
         else:
-            self.parse_resume()
+            self.parse_resume(document)
         return self.estropada
 
-    def parse_headings(self):
+    def parse_headings(self, document):
         '''Parse headings table'''
-        heading_one = self.document.cssselect('#contenido h1')
+        heading_one = document.cssselect('#contenido h1')
         estropada = heading_one[0].text.strip()
         estropada = estropada.replace("Resultados de: ", "")
         return (estropada)
@@ -213,8 +226,8 @@ class ArcParserLegacy(object):
             new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
         return new_date
 
-    def parse_tandas(self, urtea):
-        tandas = self.document.cssselect('table.resultados')
+    def parse_tandas(self, document, urtea):
+        tandas = document.cssselect('table.resultados')
         for num, text in enumerate(tandas):
             rows = text.findall('.//tr')
             for kalea, row in enumerate(rows):
@@ -246,8 +259,8 @@ class ArcParserLegacy(object):
             taldea.tanda_postua = tanda_posizioak[taldea.tanda]
             tanda_posizioak[taldea.tanda] = tanda_posizioak[taldea.tanda] + 1
 
-    def parse_resume(self):
-        sailkapenak = self.document.cssselect('#resultado table')
+    def parse_resume(self, document):
+        sailkapenak = document.cssselect('#resultado table')
         tandaKopurua = len(sailkapenak)
         rows = sailkapenak[tandaKopurua-1].findall('.//tr')
         tanda_posizioak = [0] + [1] * 7
@@ -275,37 +288,37 @@ class ArcParserLegacy(object):
                 logging.warn(self.estropada.izena)
                 logging.info("Error parsing results", exec_info=True)
 
-class EuskotrenParser(object):
+class EuskotrenParser(Parser):
     '''Base class to parse an Euskotren race result'''
 
-    def __init__(self, **kwargs):
-        if 'urla' in kwargs:
-            self.urla = kwargs['urla']
+    def __init__(self):
+        pass
 
-    def parse(self, content, estropada_id=0):
+    def parse(self, *args):
         '''Parse a result and return an estropada object'''
-        self.document = lxml.html.fromstring(content)
-        (estropadaName, estropadaDate) = self.parse_headings()
-        opts = {'urla': self.urla, 'estropada_id': estropada_id}
+        urla = args[0]
+        document = self.get_content(*args)
+        (estropadaName, estropadaDate) = self.parse_headings(document)
+        opts = {'urla': urla}
         self.estropada = Estropada(estropadaName, **opts)
         self.estropada.mydate = estropadaDate
         self.estropada.liga = 'euskotren'
-        self.numberOfHeats = self.document.find_class('tabla_2')
-        self.parse_tandas()
-        self.parse_resume()
+        self.parse_tandas(document)
+        self.parse_resume(document)
         return self.estropada
 
-    def parse_headings(self):
+    def parse_headings(self, document):
         '''Parse headings table'''
-        heading_three = self.document.cssselect('h3')
+        heading_three = document.cssselect('h3')
         name = heading_three[0].text_content().strip()
         heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
         estropada = heading.group(1).strip()
         data = heading.group(2)
         return (estropada, data)
 
-    def parse_tandas(self):
-        for num, heat in enumerate(self.numberOfHeats):
+    def parse_tandas(self, document):
+        numberOfHeats = document.find_class('tabla_2')
+        for num, heat in enumerate(numberOfHeats):
             results = heat.findall('.//tbody//tr')
             for result in results:
                 resultData = [x.text for x in result.findall('.//td')]
@@ -325,8 +338,8 @@ class EuskotrenParser(object):
                                               posizioa=0)
                     self.estropada.taldeak_add(teamResult)
 
-    def parse_resume(self):
-        sailkapena = self.document.find_class('tabla')
+    def parse_resume(self, document):
+        sailkapena = document.find_class('tabla')
         if len(sailkapena) > 0:
             rows = sailkapena[0].findall('.//tbody//tr')
 
@@ -352,9 +365,8 @@ class EstropadakParser(object):
     parsers = {'act': ActParser, 'arc': ArcParser, 'euskotren':
             EuskotrenParser, 'arc-legacy': ArcParserLegacy}
 
-    def __new__(cls, league, **kwargs):
-        print("Kwargs: %s" % kwargs)
-        return cls.parsers[league](**kwargs)
+    def __new__(cls, league):
+        return cls.parsers[league]()
 
 
 class ActEgutegiaParser(object):
