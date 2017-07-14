@@ -149,7 +149,10 @@ class ArcParser(Parser):
         new_date = new_date.replace('Ago', '08')
         new_date = new_date.replace('Sept', '09')
         date_list = re.split(' ', new_date)
-        new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
+        (day, month, year) = date_list
+        if int(day) < 10:
+            day = '0' + day
+        new_date = year +  "-" + month +  "-" + day
         return new_date
 
     def parse_tandas(self, document):
