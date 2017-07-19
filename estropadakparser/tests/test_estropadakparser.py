@@ -2,7 +2,7 @@ import unittest
 import pytest
 import urllib.request
 import re
-from estropadakparser.estropadakparser import EstropadakParser
+from estropadakparser.estropadakparser import EstropadakParser, EuskotrenEgutegiaParser
 from estropadakparser.estropada.estropada import Estropada
 
 
@@ -121,6 +121,15 @@ class TestEstropadakParser(unittest.TestCase):
             self.assertRegexpMatches(taldea.ziabogak[0], '\d{1,2}:\d{2}')
             self.assertRegexpMatches(taldea.denbora, '\d{2}:\d{2},\d{2}')
 
+class TestEuskotrenEgutegiaParser(unittest.TestCase):
+    def test_parse(self):
+        euskotren_url = ('http://www.euskolabelliga.com/'
+                         'femenina/calendario/index.php?id=es')
+        estropadak = EuskotrenEgutegiaParser().parse(euskotren_url)
+        assert len(estropadak) == 8
+        assert estropadak[0].izena == 'V. Orio Kanpina Bandera'
+        assert estropadak[0].lekua == 'Orio'
+        assert estropadak[0].mydate == '2017-07-08 17:30'
 
 if __name__ == 'main':
     unittest.main()

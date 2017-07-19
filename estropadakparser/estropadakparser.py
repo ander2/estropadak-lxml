@@ -7,6 +7,7 @@ import urllib
 
 from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
+
 class Parser(object):
 
     def __init__(self):
@@ -59,7 +60,7 @@ class ActParser(Parser):
         lekua = ''
         if heading_table:
             lekua = heading_table[1].text.strip()
-            ordua =  heading_table[3].text.strip().replace('.', ':')
+            ordua = heading_table[3].text.strip().replace('.', ':')
         data = data + ' ' + ordua
         return (estropada, data, lekua)
 
@@ -132,7 +133,7 @@ class ArcParser(Parser):
         heading_two = document.cssselect('.resultado h2')
         estropada = heading_two[0].text.strip()
         date_block = document.cssselect('li.fecha')
-        hour_block =  document.cssselect('li.hora')
+        hour_block = document.cssselect('li.hora')
         resume_block = document.cssselect('.articulo ul li')
         # Remove map span
         resume_block[3].cssselect('span')[0].drop_tree()
@@ -152,7 +153,7 @@ class ArcParser(Parser):
         (day, month, year) = date_list
         if int(day) < 10:
             day = '0' + day
-        new_date = year +  "-" + month +  "-" + day
+        new_date = year + "-" + month + "-" + day
         return new_date
 
     def parse_tandas(self, document):
@@ -190,12 +191,12 @@ class ArcParser(Parser):
                             t.puntuazioa = 0
                         tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
 
+
 class ArcParserLegacy(Parser):
     '''Base class to parse an ARC legacy(2006-2008) race result'''
 
     def __init__(self, **kwargs):
         pass
-
 
     def parse(self, *args):
         '''Parse a result and return an estropada object'''
@@ -230,7 +231,7 @@ class ArcParserLegacy(Parser):
         new_date = new_date.replace('Sept', '09')
         date_list = re.split('-', new_date)
         if len(date_list) == 3:
-            new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
+            new_date = date_list[2] + "-" + date_list[1] + "-" + date_list[0]
         return new_date
 
     def parse_tandas(self, document, urtea):
@@ -295,6 +296,7 @@ class ArcParserLegacy(Parser):
                 logging.warn(self.estropada.izena)
                 logging.info("Error parsing results", exec_info=True)
 
+
 class EuskotrenParser(Parser):
     '''Base class to parse an Euskotren race result'''
 
@@ -329,10 +331,10 @@ class EuskotrenParser(Parser):
             results = heat.findall('.//tbody//tr')
             for result in results:
                 resultData = [x.text for x in result.findall('.//td')]
-                if resultData[1] != None:
+                if resultData[1] is not None:
                     teamName = resultData[1].strip()
-                    #ziabogak = map(lambda s: s or '', resultData[2:5])
-                    ziabogak = [result if result != None else '' for result in resultData[2:5]]
+                    # ziabogak = map(lambda s: s or '', resultData[2:5])
+                    ziabogak = [result if result is not None else '' for result in resultData[2:5]]
                     if resultData[5] is None:
                         denbora = ''
                     else:
@@ -353,7 +355,7 @@ class EuskotrenParser(Parser):
             for row in rows:
                 position = row.find('.//td[1]//span').text.strip()
                 teamName = row.find('.//td[2]').text
-                if teamName != None:
+                if teamName is not None:
                     teamName = row.find('.//td[2]').text.strip()
                     puntuazioa = row.find('.//td[7]').text.strip()
                     for t in self.estropada.taldeak:
@@ -370,7 +372,7 @@ class EstropadakParser(object):
     '''Factory class that returns the right parser
     based on the league name '''
     parsers = {'act': ActParser, 'arc': ArcParser, 'euskotren':
-            EuskotrenParser, 'arc-legacy': ArcParserLegacy}
+               EuskotrenParser, 'arc-legacy': ArcParserLegacy}
 
     def __new__(cls, league):
         return cls.parsers[league]()
@@ -404,6 +406,7 @@ class ActEgutegiaParser(object):
             estropadak.append(estropada)
         return estropadak
 
+
 class ArcEgutegiaParser(object):
     '''Base class to parse the ARC1/ARC2 calendar'''
 
@@ -419,7 +422,7 @@ class ArcEgutegiaParser(object):
         new_date = new_date.replace('Septiembre', '09')
         date_list = re.split(' ', new_date)
         if len(date_list) == 3:
-            new_date = date_list[2] +  "-" + date_list[1] +  "-" + date_list[0]
+            new_date = date_list[2] + "-" + date_list[1] + "-" + date_list[0]
         return new_date
 
     def parse(self, content):
@@ -443,27 +446,31 @@ class ArcEgutegiaParser(object):
             estropadak.append(estropada)
         return estropadak
 
-class EuskotrenEgutegiaParser(object):
+
+class EuskotrenEgutegiaParser(Parser):
     '''Base class to parse the Euskotren calendar'''
 
     def __init__(self):
         self.document = ''
         self.estropada = None
 
-    def parse(self, content):
+    def parse(self, *args):
+        urla = args[0]
+        document = self.get_content(*args)
         self.liga = 'euskotren'
-        self.document = lxml.html.fromstring(content)
         selector = '.tabla_2 tbody tr'
         estropadak = []
-        table_rows = self.document.cssselect(selector)
+        table_rows = document.cssselect(selector)
         for i, row in enumerate(table_rows):
             anchor = row.cssselect('a')
             izena = anchor[0].text.strip()
-            link = "http://www.ligaact.com" + anchor[0].attrib['href'].replace('calendario', 'resultados')
+            link = "http://www.euskolabelliga.com" + anchor[0].attrib['href'].replace('calendario', 'resultados')
             lekua = row.cssselect('td')[2].text.strip()
             data = row.cssselect('td')[3].text.strip()
-            estropada = Estropada(izena, None)
-            estropada.mydate = data
+            ordua = row.cssselect('td')[4].text.strip().replace('.', ':')
+            opts = {'urla': link}
+            estropada = Estropada(izena, **opts)
+            estropada.mydate = '%s %s' % (data, ordua)
             estropada.urla = link
             estropada.lekua = lekua
             estropada.liga = self.liga
