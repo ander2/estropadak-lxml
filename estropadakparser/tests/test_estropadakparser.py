@@ -25,9 +25,9 @@ def test_parse_act():
     estropada = EstropadakParser('act').parse(act_url)
     assert str(estropada) == 'Bandera Euskadi Basque Country (2013-06-16 12:00)'
     assert estropada.izena == 'Bandera Euskadi Basque Country'
-    assert len(estropada.taldeak) == 12
+    assert len(estropada.sailkapena) == 12
     assert estropada.urla == act_url
-    for taldea in estropada.taldeak:
+    for taldea in estropada.sailkapena:
         assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, 13)
         assert type(taldea.puntuazioa) == int
@@ -48,8 +48,8 @@ def test_parse_arc1():
     assert str(estropada) == 'XXIII Bandera Ayuntamiento de Camargo (2013-08-24 18:15)'
     assert estropada.liga == 'ARC1'
     assert estropada.urla == arc1_url
-    talde_kopurua = len(estropada.taldeak)
-    for taldea in estropada.taldeak:
+    talde_kopurua = len(estropada.sailkapena)
+    for taldea in estropada.sailkapena:
         assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, talde_kopurua + 1)
         assert type(taldea.puntuazioa) == int
@@ -68,8 +68,8 @@ def test_parse_arc2():
     estropada = EstropadakParser('arc').parse(arc2_url)
     assert str(estropada) == 'XLI Bandera Ciudad de Castro-VI Mem. Avelino Ibañez (2013-08-15 18:00)'
     assert estropada.urla == arc2_url
-    talde_kopurua = len(estropada.taldeak)
-    for taldea in estropada.taldeak:
+    talde_kopurua = len(estropada.sailkapena)
+    for taldea in estropada.sailkapena:
         assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, talde_kopurua + 1)
         assert type(taldea.puntuazioa) == int
@@ -86,10 +86,10 @@ def test_parse_arc_legacy():
     url = 'http://www.liga-arc.com/historico/resultados_detalle.php?id=123'
     estropada = EstropadakParser('arc-legacy').parse(url, None, '2007-06-30','ARC1')
     assert isinstance(estropada, Estropada)
-    talde_kopurua = len(estropada.taldeak)
+    talde_kopurua = len(estropada.sailkapena)
     assert talde_kopurua == 12
     assert estropada.urla == url
-    for taldea in estropada.taldeak:
+    for taldea in estropada.sailkapena:
         assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, talde_kopurua + 1)
         assert type(taldea.kalea) == int
@@ -106,8 +106,8 @@ def test_euskotren_emaitzak_parser():
     estropada = EstropadakParser('euskotren').parse(euskotren_url)
     assert str(estropada) == 'V Bandera Marina de Cudeyo (2014-07-12)'
     assert estropada.urla == euskotren_url
-    talde_kopurua = len(estropada.taldeak)
-    for taldea in estropada.taldeak:
+    talde_kopurua = len(estropada.sailkapena)
+    for taldea in estropada.sailkapena:
         assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, talde_kopurua + 1)
         assert type(taldea.puntuazioa) == int
@@ -126,7 +126,7 @@ def test_euskotren_egutegia_parser():
     assert len(estropadak) == 8
     assert estropadak[0].izena == 'V. Orio Kanpina Bandera'
     assert estropadak[0].lekua == 'Orio'
-    assert estropadak[0].mydate == '2017-07-08 17:30'
+    assert estropadak[0].data == '2017-07-08 17:30'
     assert estropadak[7].izena == 'Zarauzko IX Ikurriña J2'
     assert estropadak[7].lekua == 'Zarautz'
-    assert estropadak[7].mydate == '2017-08-20 12:00'
+    assert estropadak[7].data == '2017-08-20 12:00'
