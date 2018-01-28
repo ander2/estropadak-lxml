@@ -13,9 +13,9 @@ class Estropada(object):
     """Base class to store a boat race info and result"""
 
     def __init__(self, izena, **kwargs):
-        self.__taldeak = []
+        self.__sailkapena = []
         self.__izena = izena
-        self.__mydate = ''
+        self.__data = ''
         self.__liga = ''
         self.__lekua = ''
         if 'urla' in kwargs:
@@ -28,13 +28,13 @@ class Estropada(object):
         self.version = sys.version_info[1]
 
     def __gt__(self, other):
-        return self.__my_date > other.__my_date
+        return self.__data > other.__data
 
     def __lt__(self, other):
-        return self.__my_date < other.__my_date
+        return self.__data < other.__data
 
     def __repr__(self):
-        return '{} ({})'.format(self.__izena, self.__mydate)
+        return '{} ({})'.format(self.__izena, self.__data)
 
     @property
     def izena(self):
@@ -45,11 +45,11 @@ class Estropada(object):
         self.__izena = izena
 
     @property
-    def taldeak(self):
-        return self.__taldeak
+    def sailkapena(self):
+        return self.__sailkapena
 
     def taldeak_add(self, taldea):
-        self.__taldeak.append(taldea)
+        self.__sailkapena.append(taldea)
 
     @property
     def oharrak(self):
@@ -60,12 +60,12 @@ class Estropada(object):
         self.__oharrak = oharra
 
     @property
-    def mydate(self):
-        return self.__mydate
+    def data(self):
+        return self.__data
 
-    @mydate.setter
-    def mydate(self, mydata):
-        self.__mydate = mydata
+    @data.setter
+    def data(self, mydata):
+        self.__data = mydata
 
     @property
     def liga(self):
@@ -95,7 +95,7 @@ class Estropada(object):
         print(self.__izena)
         print('{0:^6}\t{1:^5}\t{2:^5}\t{3:^30}\t{4:^25}\t{5:^8}'.format(
               'Postua', 'Tanda', 'Kalea', 'Taldea', 'Ziabogak', 'Denbora'))
-        for talde in sorted(self.__taldeak, key=lambda x: x.posizioa):
+        for talde in sorted(self.__sailkapena, key=lambda x: x.posizioa):
             print(u'{0:<6}\t{1:^5}\t{2:^5}\t{3:<30}\t{4:<25}\t{5:<8}'.format(
                   str(talde.posizioa), talde.tanda, talde.kalea,
                   talde.talde_izena, u'\t'.join(talde.ziabogak),
@@ -111,7 +111,7 @@ class Estropada(object):
 
     def format_for_json(self, o):
         if isinstance(o, Estropada):
-            return dict(izena=o.__izena, data=o.__mydate, liga=o.__liga,
+            return dict(izena=o.__izena, data=o.__data, liga=o.__liga,
                         urla=o.__urla, lekua=o.__lekua, sailkapena=o.__taldeak)
         else:
             return o.__dict__
