@@ -15,16 +15,10 @@ class Estropada(object):
     def __init__(self, izena, **kwargs):
         self.__sailkapena = []
         self.__izena = izena
-        self.__data = ''
-        self.__liga = ''
-        self.__lekua = ''
-        if 'urla' in kwargs:
-            self.__urla = kwargs['urla']
-        if 'estropada_id' in kwargs:
-            self.__estropada_id = kwargs['estropada_id']
-        if 'liga' in kwargs:
-            self.__liga = kwargs['liga']
-        self.__oharrak = ''
+        for key in kwargs.keys():
+            if key == 'izena':
+                continue 
+            setattr(self, key, kwargs[key])
         self.version = sys.version_info[1]
 
     def __gt__(self, other):
@@ -112,7 +106,7 @@ class Estropada(object):
     def format_for_json(self, o):
         if isinstance(o, Estropada):
             return dict(izena=o.__izena, data=o.__data, liga=o.__liga,
-                        urla=o.__urla, lekua=o.__lekua, sailkapena=o.__taldeak)
+                        urla=o.__urla, lekua=o.__lekua, sailkapena=o.__sailkapena)
         else:
             return o.__dict__
 

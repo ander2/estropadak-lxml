@@ -398,11 +398,9 @@ class ActEgutegiaParser(object):
             lek_data = row.cssselect('.place')
             lekua = lek_data[0].text.strip()
             data = lek_data[1].text.strip()
-            estropada = Estropada(izena, None)
-            estropada.data = data
-            estropada.lekua = lekua
-            estropada.urla = 'http://www.euskolabelliga.com' + link
-            estropada.liga = 'ACT'
+            urla = 'http://www.euskolabelliga.com' + link
+            opts = { 'urla': urla, 'data': data, 'lekua': lekua, 'liga': 'ACT'}
+            estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak
 
@@ -439,10 +437,8 @@ class ArcEgutegiaParser(object):
             link = anchor[0].attrib['href']
             lek_data = row.cssselect('.fecha span')
             data = self.parse_date(lek_data[0].text.strip() + ' 2017')
-            estropada = Estropada(izena, None)
-            estropada.data = data
-            estropada.urla = link
-            estropada.liga = self.liga
+            opts = { 'urla': link, 'data': data, 'liga': self.liga}
+            estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak
 
@@ -468,11 +464,8 @@ class EuskotrenEgutegiaParser(Parser):
             lekua = row.cssselect('td')[2].text.strip()
             data = row.cssselect('td')[3].text.strip()
             ordua = row.cssselect('td')[4].text.strip().replace('.', ':')
-            opts = {'urla': link}
+            data_osoa = '%s %s' % (data, ordua)
+            opts = { 'urla': link, 'lekua': lekua, 'data': data_osoa, 'liga': self.liga}
             estropada = Estropada(izena, **opts)
-            estropada.data = '%s %s' % (data, ordua)
-            estropada.urla = link
-            estropada.lekua = lekua
-            estropada.liga = self.liga
             estropadak.append(estropada)
         return estropadak
