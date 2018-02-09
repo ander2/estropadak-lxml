@@ -432,7 +432,7 @@ class ArcEgutegiaParser(object):
         estropadak = []
         table_rows = self.document.cssselect(selector)
         for i, row in enumerate(table_rows):
-            anchor = row.cssselect('.race_name a')
+            anchor = row.cssselect('a')
             izena = anchor[0].text.strip()
             link = anchor[0].attrib['href']
             lek_data = row.cssselect('.fecha span')
