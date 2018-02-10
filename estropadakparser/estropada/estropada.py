@@ -122,7 +122,6 @@ class TaldeEmaitza(object):
 
     def __init__(self, talde_izena, **kwargs):
         self.talde_izena = talde_izena
-        self.talde_id = ''
         self.ziabogak = []
         for key, value in kwargs.items():
             setattr(self, key, value)
