@@ -6,18 +6,15 @@ import json
 class Encoder(json.JSONEncoder):
 
     def default(self, o):
-        return o.__dict__
+        return dict(izena=o.__izena, data=o.__data, liga=o.__liga,
+                    urla=o.__urla, lekua=o.__lekua, sailkapena=o.__sailkapena)
 
 
 class Estropada(object):
     """Base class to store a boat race info and result"""
 
     def __init__(self, izena, **kwargs):
-        self.__sailkapena = []
-        self.__izena = izena
         for key in kwargs.keys():
-            if key == 'izena':
-                continue 
             setattr(self, key, kwargs[key])
         self.version = sys.version_info[1]
 
@@ -42,7 +39,13 @@ class Estropada(object):
     def sailkapena(self):
         return self.__sailkapena
 
+    @sailkapena.setter
+    def sailkapena(self, sailkapena):
+        self.__sailkapena = sailkapena
+
     def taldeak_add(self, taldea):
+        if self.sailkapena is None:
+            self.sailkapena = []
         self.__sailkapena.append(taldea)
 
     @property
@@ -104,11 +107,14 @@ class Estropada(object):
                           cls=Encoder, indent=4)
 
     def format_for_json(self, o):
-        if isinstance(o, Estropada):
-            return dict(izena=o.__izena, data=o.__data, liga=o.__liga,
-                        urla=o.__urla, lekua=o.__lekua, sailkapena=o.__sailkapena)
-        else:
-            return o.__dict__
+        attrs = ['izena', 'data', 'liga', 'urla', 'lekua', 'oharrak']
+        obj = {}
+        for at in attrs:
+            if hasattr(o, at):
+                obj[at] = getattr(o, at)
+        if hasattr(o, 'sailkapena'):
+            obj['sailkapena'] = o.sailkapena
+        return obj
 
 
 class TaldeEmaitza(object):
