@@ -44,7 +44,7 @@ class Estropada(object):
         self.__sailkapena = sailkapena
 
     def taldeak_add(self, taldea):
-        if self.sailkapena is None:
+        if not hasattr(self, 'sailkapena'):
             self.sailkapena = []
         self.__sailkapena.append(taldea)
 
