@@ -14,6 +14,7 @@ class Estropada(object):
     """Base class to store a boat race info and result"""
 
     def __init__(self, izena, **kwargs):
+        self.__izena = izena
         for key in kwargs.keys():
             setattr(self, key, kwargs[key])
         self.version = sys.version_info[1]
@@ -25,7 +26,7 @@ class Estropada(object):
         return self.__data < other.__data
 
     def __repr__(self):
-        return '{} ({})'.format(self.__izena, self.__data)
+        return '{} ({})'.format(self.izena, self.__data)
 
     @property
     def izena(self):
