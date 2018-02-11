@@ -36,13 +36,8 @@ class ActParser(Parser):
         urla = args[0]
         document = self.get_content(*args)
         (estropadaName, estropadaDate, lekua) = self.parse_headings(document)
-        opts = {'urla': urla}
+        opts = {'urla': urla, 'lekua': lekua, 'data': estropadaDate, 'liga': 'ACT'}
         self.estropada = Estropada(estropadaName, **opts)
-        print(estropadaDate)
-        print(estropadaName)
-        self.estropada.lekua = lekua
-        self.estropada.data = estropadaDate
-        self.estropada.liga = 'ACT'
         self.parse_tandas(document)
         self.parse_resume(document)
         return self.estropada
@@ -114,11 +109,8 @@ class ArcParser(Parser):
         urla = args[0]
         document = self.get_content(*args)
         (estropadaName, estropadaDate, lekua, liga) = self.parse_headings(document)
-        opts = {'urla': urla}
+        opts = {'urla': urla, 'data': estropadaDate, 'liga': liga, 'lekua': lekua}
         self.estropada = Estropada(estropadaName, **opts)
-        self.estropada.data = estropadaDate
-        self.estropada.liga = liga
-        self.estropada.lekua = lekua
         self.parse_tandas(document)
         self.parse_resume(document)
         return self.estropada
@@ -206,10 +198,8 @@ class ArcParserLegacy(Parser):
         liga = args[3]
         d = datetime.datetime.strptime(estropadaDate, '%Y-%m-%d')
         (estropadaName) = self.parse_headings(document)
-        opts = {'urla': urla}
+        opts = {'urla': urla, 'data': estropadaDate, 'liga': liga}
         self.estropada = Estropada(estropadaName, **opts)
-        self.estropada.data = estropadaDate
-        self.estropada.liga = liga
         self.parse_tandas(document, d.year)
         if d.year <= 2008:
             self.calculate_tanda_posizioa()
