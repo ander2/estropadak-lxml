@@ -114,7 +114,7 @@ class Estropada(object):
             if hasattr(o, at):
                 obj[at] = getattr(o, at)
         if hasattr(o, 'sailkapena'):
-            obj['sailkapena'] = o.sailkapena
+            obj['sailkapena'] = [sailk.__dict__ for sailk in o.sailkapena]
         return obj
 
 
