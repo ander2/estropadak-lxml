@@ -2,4 +2,6 @@
 *.swp
 .vscode
 .cache
+.project
+.pydevproject
 dist/
