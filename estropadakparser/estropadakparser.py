@@ -14,7 +14,7 @@ class Parser(object):
         pass
 
     def get_content(self, *args):
-        '''Parse a result and return an estropada object'''
+        '''Get content from URL or HTML string'''
         urla = args[0]
         if len(args) == 2 and args[1] is not None:
             document = lxml.html.fromstring(args[1])
@@ -43,7 +43,7 @@ class ActParser(Parser):
         return self.estropada
 
     def parse_headings(self, document):
-        '''Parse headings table'''
+        '''Parse table headings'''
         heading_three = document.cssselect('h3')
         data = ''
         if len(heading_three) > 0:
@@ -366,6 +366,10 @@ class EstropadakParser(object):
 
     def __new__(cls, league):
         return cls.parsers[league]()
+
+    @classmethod
+    def register(cls, league, parser):
+        cls.parsers[league] = parser
 
 
 class ActEgutegiaParser(object):
