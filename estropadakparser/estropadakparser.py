@@ -389,7 +389,7 @@ class ActEgutegiaParser(object):
             lekua = lek_data[0].text.strip()
             data = lek_data[1].text.strip()
             urla = 'http://www.euskolabelliga.com' + link
-            opts = { 'urla': urla, 'data': data, 'lekua': lekua, 'liga': 'ACT'}
+            opts = { 'urla': urla, 'data': data, 'lekua': lekua, 'liga': 'ACT', 'sailkapena': []}
             estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak
@@ -402,6 +402,14 @@ class ArcEgutegiaParser(object):
         self.document = ''
         self.estropada = None
         self.liga = liga
+
+    def parse_year(self):
+        selector = 'h1 span span'
+        h1_sections = self.document.cssselect(selector)
+        year = datetime.datetime.now().year
+        if len(h1_sections) > 0:
+            year = h1_sections[0].text.strip()
+        return year
 
     def parse_date(self, date):
         new_date = date.replace('Junio', '06')
@@ -420,13 +428,14 @@ class ArcEgutegiaParser(object):
         else:
             selector = 'tr.tab-item.g2'
         estropadak = []
+        year = self.parse_year()
         table_rows = self.document.cssselect(selector)
-        for i, row in enumerate(table_rows):
+        for row in table_rows:
             anchor = row.cssselect('a')
             izena = anchor[0].text.strip()
             link = anchor[0].attrib['href']
             lek_data = row.cssselect('.fecha span')
-            data = self.parse_date(lek_data[0].text.strip() + ' 2017')
+            data = self.parse_date('{} {}'.format(lek_data[0].text.strip(),  year))
             opts = { 'urla': link, 'data': data, 'liga': self.liga}
             estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
@@ -447,7 +456,7 @@ class EuskotrenEgutegiaParser(Parser):
         selector = '.tabla_2 tbody tr'
         estropadak = []
         table_rows = document.cssselect(selector)
-        for i, row in enumerate(table_rows):
+        for row in table_rows:
             anchor = row.cssselect('a')
             izena = anchor[0].text.strip()
             link = "http://www.euskolabelliga.com" + anchor[0].attrib['href'].replace('calendario', 'resultados')
