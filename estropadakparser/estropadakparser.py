@@ -14,7 +14,7 @@ class Parser(object):
         pass
 
     def get_content(self, *args):
-        '''Parse a result and return an estropada object'''
+        '''Get content from URL or HTML string'''
         urla = args[0]
         if len(args) == 2 and args[1] is not None:
             document = lxml.html.fromstring(args[1])
@@ -36,19 +36,14 @@ class ActParser(Parser):
         urla = args[0]
         document = self.get_content(*args)
         (estropadaName, estropadaDate, lekua) = self.parse_headings(document)
-        opts = {'urla': urla}
+        opts = {'urla': urla, 'lekua': lekua, 'data': estropadaDate, 'liga': 'ACT'}
         self.estropada = Estropada(estropadaName, **opts)
-        print(estropadaDate)
-        print(estropadaName)
-        self.estropada.lekua = lekua
-        self.estropada.data = estropadaDate
-        self.estropada.liga = 'ACT'
         self.parse_tandas(document)
         self.parse_resume(document)
         return self.estropada
 
     def parse_headings(self, document):
-        '''Parse headings table'''
+        '''Parse table headings'''
         heading_three = document.cssselect('h3')
         data = ''
         if len(heading_three) > 0:
@@ -114,11 +109,8 @@ class ArcParser(Parser):
         urla = args[0]
         document = self.get_content(*args)
         (estropadaName, estropadaDate, lekua, liga) = self.parse_headings(document)
-        opts = {'urla': urla}
+        opts = {'urla': urla, 'data': estropadaDate, 'liga': liga, 'lekua': lekua}
         self.estropada = Estropada(estropadaName, **opts)
-        self.estropada.data = estropadaDate
-        self.estropada.liga = liga
-        self.estropada.lekua = lekua
         self.parse_tandas(document)
         self.parse_resume(document)
         return self.estropada
@@ -206,10 +198,8 @@ class ArcParserLegacy(Parser):
         liga = args[3]
         d = datetime.datetime.strptime(estropadaDate, '%Y-%m-%d')
         (estropadaName) = self.parse_headings(document)
-        opts = {'urla': urla}
+        opts = {'urla': urla, 'data': estropadaDate, 'liga': liga}
         self.estropada = Estropada(estropadaName, **opts)
-        self.estropada.data = estropadaDate
-        self.estropada.liga = liga
         self.parse_tandas(document, d.year)
         if d.year <= 2008:
             self.calculate_tanda_posizioa()
@@ -377,6 +367,10 @@ class EstropadakParser(object):
     def __new__(cls, league):
         return cls.parsers[league]()
 
+    @classmethod
+    def register(cls, league, parser):
+        cls.parsers[league] = parser
+
 
 class ActEgutegiaParser(object):
     '''Base class to parse the ACT calendar'''
@@ -398,11 +392,9 @@ class ActEgutegiaParser(object):
             lek_data = row.cssselect('.place')
             lekua = lek_data[0].text.strip()
             data = lek_data[1].text.strip()
-            estropada = Estropada(izena, None)
-            estropada.data = data
-            estropada.lekua = lekua
-            estropada.urla = 'http://www.euskolabelliga.com' + link
-            estropada.liga = 'ACT'
+            urla = 'http://www.euskolabelliga.com' + link
+            opts = { 'urla': urla, 'data': data, 'lekua': lekua, 'liga': 'ACT', 'sailkapena': []}
+            estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak
 
@@ -414,6 +406,14 @@ class ArcEgutegiaParser(object):
         self.document = ''
         self.estropada = None
         self.liga = liga
+
+    def parse_year(self):
+        selector = 'h1 span span'
+        h1_sections = self.document.cssselect(selector)
+        year = datetime.datetime.now().year
+        if len(h1_sections) > 0:
+            year = h1_sections[0].text.strip()
+        return year
 
     def parse_date(self, date):
         new_date = date.replace('Junio', '06')
@@ -432,17 +432,16 @@ class ArcEgutegiaParser(object):
         else:
             selector = 'tr.tab-item.g2'
         estropadak = []
+        year = self.parse_year()
         table_rows = self.document.cssselect(selector)
-        for i, row in enumerate(table_rows):
-            anchor = row.cssselect('.race_name a')
+        for row in table_rows:
+            anchor = row.cssselect('a')
             izena = anchor[0].text.strip()
             link = anchor[0].attrib['href']
             lek_data = row.cssselect('.fecha span')
-            data = self.parse_date(lek_data[0].text.strip() + ' 2017')
-            estropada = Estropada(izena, None)
-            estropada.data = data
-            estropada.urla = link
-            estropada.liga = self.liga
+            data = self.parse_date('{} {}'.format(lek_data[0].text.strip(),  year))
+            opts = { 'urla': link, 'data': data, 'liga': self.liga}
+            estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak
 
@@ -461,18 +460,15 @@ class EuskotrenEgutegiaParser(Parser):
         selector = '.tabla_2 tbody tr'
         estropadak = []
         table_rows = document.cssselect(selector)
-        for i, row in enumerate(table_rows):
+        for row in table_rows:
             anchor = row.cssselect('a')
             izena = anchor[0].text.strip()
             link = "http://www.euskolabelliga.com" + anchor[0].attrib['href'].replace('calendario', 'resultados')
             lekua = row.cssselect('td')[2].text.strip()
             data = row.cssselect('td')[3].text.strip()
             ordua = row.cssselect('td')[4].text.strip().replace('.', ':')
-            opts = {'urla': link}
+            data_osoa = '%s %s' % (data, ordua)
+            opts = { 'urla': link, 'lekua': lekua, 'data': data_osoa, 'liga': self.liga}
             estropada = Estropada(izena, **opts)
-            estropada.data = '%s %s' % (data, ordua)
-            estropada.urla = link
-            estropada.lekua = lekua
-            estropada.liga = self.liga
             estropadak.append(estropada)
         return estropadak
