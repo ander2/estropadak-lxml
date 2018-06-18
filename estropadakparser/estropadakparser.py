@@ -128,8 +128,10 @@ class ArcParser(Parser):
         hour_block = document.cssselect('li.hora')
         resume_block = document.cssselect('.articulo ul li')
         # Remove map span
-        resume_block[3].cssselect('span')[0].drop_tree()
-        lekua = resume_block[3].text_content().strip()
+        lekua = ''
+        if len(resume_block) == 4:
+            resume_block[3].cssselect('span')[0].drop_tree()
+            lekua = resume_block[3].text_content().strip()
         date = date_block[0].text_content().strip(" \n").replace('Fecha', '').strip(" \n")
         new_date = self.parse_date(date)
         hour = hour_block[0].text_content().replace('Hora', '').strip()
@@ -430,7 +432,8 @@ class ArcEgutegiaParser(object):
             izena = anchor[0].text.strip()
             link = anchor[0].attrib['href']
             lek_data = row.cssselect('.fecha span')
-            data = self.parse_date(lek_data[0].text.strip() + ' 2017')
+            year = datetime.datetime.now().year
+            data = self.parse_date('{} {}'.format(lek_data[0].text.strip(), year))
             opts = { 'urla': link, 'data': data, 'liga': self.liga}
             estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
