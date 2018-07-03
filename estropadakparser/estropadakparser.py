@@ -48,16 +48,23 @@ class ActParser(Parser):
         data = ''
         if len(heading_three) > 0:
             name = heading_three[0].text.strip()
-            heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
-            estropada = heading.group(1).strip()
-            data = heading.group(2)
+            estropada = name.split('(')[0]
+            quoted_text = re.findall('\(([^\)]+)', name)
+            for t in quoted_text:
+                try:
+                    data = datetime.datetime.strptime(t, '%Y-%m-%d')
+                except ValueError:
+                    estropada = estropada + t
         heading_table = document.cssselect('table[summary="Regata Puntuable"] td')
         lekua = ''
         if heading_table:
             lekua = heading_table[1].text.strip()
-            ordua = heading_table[3].text.strip().replace('.', ':')
-        data = data + ' ' + ordua
-        return (estropada, data, lekua)
+            ordua = heading_table[3].text.strip().split('.')
+            data_ordua = data.replace(hour=int(ordua[0]), minute=int(ordua[1]))
+            data_text = data_ordua.strftime('%Y-%m-%d %H:%M')
+        else:
+            data_text = data_ordua.strftime('%Y-%m-%d')
+        return (estropada, data_text , lekua)
 
     def parse_tandas(self, document):
         '''Parse race's paces tables'''
