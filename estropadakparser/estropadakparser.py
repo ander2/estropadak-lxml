@@ -135,8 +135,10 @@ class ArcParser(Parser):
         hour_block = document.cssselect('li.hora')
         resume_block = document.cssselect('.articulo ul li')
         # Remove map span
-        resume_block[3].cssselect('span')[0].drop_tree()
-        lekua = resume_block[3].text_content().strip()
+        lekua = ''
+        if len(resume_block) == 4:
+            resume_block[3].cssselect('span')[0].drop_tree()
+            lekua = resume_block[3].text_content().strip()
         date = date_block[0].text_content().strip(" \n").replace('Fecha', '').strip(" \n")
         new_date = self.parse_date(date)
         hour = hour_block[0].text_content().replace('Hora', '').strip()
