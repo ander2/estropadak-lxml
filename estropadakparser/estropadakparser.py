@@ -45,9 +45,6 @@ class ActParser(Parser):
         return self.estropada
 
     def calculate_points_positions(self):
-        print("****")
-        print(self.estropada.sailkapena)
-        print("****")
         self.estropada.sailkapena.sort(key = lambda x: datetime.datetime.strptime(x.denbora, '%M:%S,%f'))
         for index, taldea in enumerate(self.estropada.sailkapena):
             taldea.posizioa = index + 1
