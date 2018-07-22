@@ -39,8 +39,16 @@ class ActParser(Parser):
         opts = {'urla': urla, 'lekua': lekua, 'data': estropadaDate, 'liga': 'ACT'}
         self.estropada = Estropada(estropadaName, **opts)
         self.parse_tandas(document)
-        self.parse_resume(document)
+        resume = self.parse_resume(document)
+        if resume is None:
+            self.calculate_points_positions()
         return self.estropada
+
+    def calculate_points_positions(self):
+        self.estropada.sailkapena.sort(key = lambda x: datetime.datetime.strptime(x.denbora, '%M:%S,%f'))
+        for index, taldea in enumerate(self.estropada.sailkapena):
+            taldea.posizioa = index + 1
+            taldea.puntuazioa = len(self.estropada.sailkapena) + 1 - taldea.posizioa
 
     def parse_headings(self, document):
         '''Parse table headings'''
@@ -48,7 +56,7 @@ class ActParser(Parser):
         data = ''
         if len(heading_three) > 0:
             name = heading_three[0].text.strip()
-            estropada = name.split('(')[0]
+            estropada = name.split('(')[0].strip()
             quoted_text = re.findall('\(([^\)]+)', name)
             for t in quoted_text:
                 try:
@@ -59,13 +67,12 @@ class ActParser(Parser):
         lekua = ''
         if heading_table:
             lekua = heading_table[1].text.strip()
-            ordua = heading_table[3].text.strip().split('.')
-            data_ordua = data.replace(hour=int(ordua[0]), minute=int(ordua[1]))
+            ordua = re.split('[.:]', heading_table[3].text.strip())
+            data_ordua = data.replace(hour=int(ordua[0], 10), minute=int(ordua[1], 10))
             data_text = data_ordua.strftime('%Y-%m-%d %H:%M')
         else:
             data_text = data_ordua.strftime('%Y-%m-%d')
         return (estropada, data_text , lekua)
-
     def parse_tandas(self, document):
         '''Parse race's paces tables'''
         tandas = document.find_class('tabla_tanda')
@@ -89,20 +96,24 @@ class ActParser(Parser):
         except:
             rows = []
         for num, row in enumerate(rows):
-            if num == 0:
-                posizioa = row.find('.//td[1]//span').text.strip()
-            else:
-                posizioa = row.find('.//td[1]').text.strip()
-            team = row.find('.//td[2]').text.strip()
-            puntuak = row.find('.//td[7]').text.strip()
-            for taldea in self.estropada.sailkapena:
-                if taldea.talde_izena == team:
-                    try:
-                        taldea.posizioa = int(posizioa)
-                        taldea.puntuazioa = int(puntuak)
-                    except:
-                        print("Errorea")
-                        taldea.posizioa = 1
+            try:
+                if num == 0:
+                    posizioa = row.find('.//td[1]//span').text.strip()
+                else:
+                    posizioa = row.find('.//td[1]').text.strip()
+                team = row.find('.//td[2]').text.strip()
+                puntuak = row.find('.//td[7]').text.strip()
+                for taldea in self.estropada.sailkapena:
+                    if taldea.talde_izena == team:
+                        try:
+                            taldea.posizioa = int(posizioa, 10)
+                            taldea.puntuazioa = int(puntuak, 10)
+                        except:
+                            print("Errorea")
+                            taldea.posizioa = 1
+            except:
+                return None
+
 
 
 class ArcParser(Parser):
