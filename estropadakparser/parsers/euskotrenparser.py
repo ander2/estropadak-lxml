@@ -27,10 +27,19 @@ class EuskotrenParser(Parser):
     def parse_headings(self, document):
         '''Parse headings table'''
         heading_three = document.cssselect('h3')
-        name = heading_three[0].text_content().strip()
-        heading = re.search('([^\(]*?)\(([^\)]*?)\)', name)
-        estropada = heading.group(1).strip()
-        data = heading.group(2)
+        data = ''
+        if len(heading_three) > 0:
+            name = heading_three[0].text.strip()
+            estropada = name.split('(')[0].strip()
+            quoted_text = re.findall('\(([^\)]+)', name)
+            for t in quoted_text:
+                try:
+                    data = datetime.datetime.strptime(t, '%Y-%m-%d')
+                except ValueError:
+                    estropada = estropada + t
+        data_div = document.cssselect('h3 .txikia.cursiva')[0]
+        data = datetime.datetime.strptime(data_div.text.strip(), '(%Y-%m-%d)')
+        data = data.strftime('%Y-%m-%d')
         return (estropada, data)
 
     def parse_tandas(self, document):
