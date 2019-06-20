@@ -18,7 +18,7 @@ class ActParser(Parser):
         self.estropada = Estropada(estropadaName, **opts)
         self.parse_tandas(document)
         resume = self.parse_resume(document)
-        if resume is None:
+        if resume:
             self.calculate_points_positions()
         return self.estropada
 
