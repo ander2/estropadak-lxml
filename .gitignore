@@ -4,4 +4,6 @@
 .cache
 .project
 .pydevproject
+.settings
 dist/
+venv/

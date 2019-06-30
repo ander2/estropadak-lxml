@@ -8,6 +8,8 @@ class ActEgutegiaParser(object):
     def __init__(self):
         self.document = ''
         self.estropada = None
+        self.base_url = 'http://www.euskolabelliga.com'
+        self.liga = 'ACT'
 
     def parse(self, content):
         self.document = lxml.html.fromstring(content)
@@ -22,8 +24,9 @@ class ActEgutegiaParser(object):
             lek_data = row.cssselect('.place')
             lekua = lek_data[0].text.strip()
             data = lek_data[1].text.strip()
-            urla = 'http://www.euskolabelliga.com' + link
-            opts = { 'urla': urla, 'data': data, 'lekua': lekua, 'liga': 'ACT', 'sailkapena': []}
+            urla = self.base_url + link
+            opts = { 'urla': urla, 'data': data, 'lekua': lekua, 'liga': self.liga, 'sailkapena': []}
             estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak
+
