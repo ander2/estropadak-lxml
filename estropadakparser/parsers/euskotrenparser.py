@@ -62,18 +62,12 @@ class EuskotrenParser(Parser):
                     self.estropada.taldeak_add(teamResult)
 
     def parse_resume(self, document):
-        sailkapena = document.find_class('taula')
+        sailkapena = document.cssselect('h3.clasificacion + .fondo_taula > .taula')
         if len(sailkapena) > 0:
-            azkena = len(sailkapena) - 1
-            rows = sailkapena[azkena].findall('.//tbody//tr')
+            rows = sailkapena[0].findall('.//tbody//tr')
 
             for row in rows:
-                position = row.find('.//td[1]').text
-                if position is None:
-                    position = row.find('.//td[1]//span').text.strip()
-                else:
-                    position = row.find('.//td[1]').text.strip()
-
+                position = row.find('.//td[1]').text_content()
                 teamName = row.find('.//td[2]').text
                 if teamName is not None:
                     teamName = row.find('.//td[2]').text.strip()
