@@ -1,5 +1,5 @@
 import lxml.html
-import urllib
+import urllib.request
 
 
 class Parser(object):
