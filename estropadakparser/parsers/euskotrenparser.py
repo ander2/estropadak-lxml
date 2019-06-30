@@ -37,13 +37,10 @@ class EuskotrenParser(Parser):
                     data = datetime.datetime.strptime(t, '%Y-%m-%d')
                 except ValueError:
                     estropada = estropada + t
-        data_div = document.cssselect('h3 .txikia.cursiva')[0]
-        data = datetime.datetime.strptime(data_div.text.strip(), '(%Y-%m-%d)')
-        data = data.strftime('%Y-%m-%d')
         return (estropada, data)
 
     def parse_tandas(self, document):
-        numberOfHeats = document.find_class('tabla_2')
+        numberOfHeats = document.find_class('tabla_tanda')
         for num, heat in enumerate(numberOfHeats):
             results = heat.findall('.//tbody//tr')
             for result in results:
@@ -65,12 +62,18 @@ class EuskotrenParser(Parser):
                     self.estropada.taldeak_add(teamResult)
 
     def parse_resume(self, document):
-        sailkapena = document.find_class('tabla')
+        sailkapena = document.find_class('taula')
         if len(sailkapena) > 0:
-            rows = sailkapena[0].findall('.//tbody//tr')
+            azkena = len(sailkapena) - 1
+            rows = sailkapena[azkena].findall('.//tbody//tr')
 
             for row in rows:
-                position = row.find('.//td[1]//span').text.strip()
+                position = row.find('.//td[1]').text
+                if position is None:
+                    position = row.find('.//td[1]//span').text.strip()
+                else:
+                    position = row.find('.//td[1]').text.strip()
+
                 teamName = row.find('.//td[2]').text
                 if teamName is not None:
                     teamName = row.find('.//td[2]').text.strip()
