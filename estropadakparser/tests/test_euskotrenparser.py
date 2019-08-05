@@ -3,7 +3,7 @@ from estropadakparser.parsers.euskotrenparser import EuskotrenParser
 
 def test_euskotren_emaitzak_parser():
     euskotren_url = ('http://www.ligasanmiguel.com/femenina/resultados/'
-                        'ver.php?id=es&r=1395519778')
+                        'ver.php?id=eu&r=1395519778')
     euskotrenParser = EuskotrenParser()
     estropada = euskotrenParser.parse(euskotren_url)
     assert str(estropada) == 'V Bandera Marina de Cudeyo (2014-07-12)'
