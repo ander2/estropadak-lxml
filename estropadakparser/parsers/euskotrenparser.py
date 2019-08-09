@@ -18,7 +18,7 @@ class EuskotrenParser(Parser):
         (estropadaName, estropadaDate) = self.parse_headings(document)
         opts = {'urla': urla}
         self.estropada = Estropada(estropadaName, **opts)
-        self.estropada.data = estropadaDate
+        self.estropada.data = datetime.datetime.strftime(estropadaDate, '%Y-%m-%d')
         self.estropada.liga = 'euskotren'
         self.parse_tandas(document)
         self.parse_resume(document)
