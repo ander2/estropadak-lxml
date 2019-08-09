@@ -18,8 +18,6 @@ class ActParser(Parser):
         self.estropada = Estropada(estropadaName, **opts)
         self.parse_tandas(document)
         resume = self.parse_resume(document)
-        if resume:
-            self.calculate_points_positions()
         return self.estropada
 
     def calculate_points_positions(self):
@@ -81,14 +79,12 @@ class ActParser(Parser):
                     posizioa = row.find('.//td[1]').text.strip()
                 team = row.find('.//td[2]').text.strip()
                 puntuak = row.find('.//td[7]').text.strip()
-                for taldea in self.estropada.sailkapena:
+                for i, taldea in enumerate(self.estropada.sailkapena):
                     if taldea.talde_izena == team:
                         try:
-                            taldea.posizioa = int(posizioa, 10)
-                            taldea.puntuazioa = int(puntuak, 10)
+                            self.estropada.sailkapena[i].posizioa = int(posizioa, 10)
+                            self.estropada.sailkapena[i].puntuazioa = int(puntuak, 10)
                         except:
-                            print("Errorea")
-                            taldea.posizioa = 1
+                            print(f'Ez dago posizio edo puntuazioarik {team} taldearentzat')
             except:
                 return None
-

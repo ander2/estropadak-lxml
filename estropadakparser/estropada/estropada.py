@@ -101,7 +101,7 @@ class Estropada(object):
 
     def dump_json(self):
         print(json.dumps(self, default=self.format_for_json,
-                         cls=Encoder, indent=4))
+                         indent=4))
 
     def get_json(self):
         return json.dumps(self, default=self.format_for_json,
@@ -114,7 +114,7 @@ class Estropada(object):
             if hasattr(o, at):
                 obj[at] = getattr(o, at)
         if hasattr(o, 'sailkapena'):
-            obj['sailkapena'] = [sailk.__dict__ for sailk in o.sailkapena]
+            obj['sailkapena'] = [sailk.format_for_json() for sailk in sorted(o.sailkapena)]
         return obj
 
 
@@ -128,11 +128,66 @@ class TaldeEmaitza(object):
             setattr(self, key, value)
         self.postua = ''
 
+    @property
+    def ziabogak(self):
+        return self.__ziabogak
+
+    @ziabogak.setter
+    def ziabogak(self, ziabogak):
+        self.__ziabogak = ziabogak
+
+    @property
+    def kalea(self):
+        return self.__kalea
+
+    @kalea.setter
+    def kalea(self, kalea):
+        self.__kalea = kalea
+
+    @property
+    def tanda(self):
+        return self.__tanda
+
+    @tanda.setter
+    def tanda(self, tanda):
+        self.__tanda = tanda
+
+    @property
+    def tanda_postua(self):
+        return self.__tanda_postua
+
+    @tanda_postua.setter
+    def tanda_postua(self, tanda_postua):
+        self.__tanda_postua = tanda_postua
+
+    @property
+    def denbora(self):
+        return self.__denbora
+
+    @denbora.setter
+    def denbora(self, denbora):
+        self.__denbora = denbora
+
+    @property
+    def posizioa(self):
+        return self.__posizioa
+
+    @posizioa.setter
+    def posizioa(self, posizioa):
+        self.__posizioa = posizioa
+
+    @property
+    def puntuazioa(self):
+        return self.__puntuazioa
+
+    @puntuazioa.setter
+    def puntuazioa(self, puntuazioa):
+        self.__puntuazioa = puntuazioa
+
     def ziaboga_gehitu(self, ziaboga):
         self.ziabogak.append(ziaboga)
 
     def __repr__(self):
-        # return '[{:2}] {:20} {} '.format(self.posizioa, self.talde_izena)
         return '[{:2}] {:1} {:1} {:1} {:30} {:25} {:8}'.format(
                   self.posizioa, self.tanda, self.kalea, self.tanda_postua,
                   self.talde_izena, ' '.join(self.ziabogak),
@@ -143,3 +198,15 @@ class TaldeEmaitza(object):
 
     def __lt__(self, other):
         return self.posizioa < other.posizioa
+
+    def format_for_json(self):
+        return { 
+            "talde_izena": self.talde_izena,
+            "kalea": self.kalea,
+            "tanda": self.tanda,
+            "tanda_postua": self.tanda_postua,
+            "ziabogak": self.ziabogak,
+            "denbora": self.denbora,
+            "posizioa": self.posizioa,
+            "puntuazioa": self.puntuazioa,
+        }
