@@ -49,6 +49,7 @@ class ActParser(Parser):
         else:
             data_text = data_ordua.strftime('%Y-%m-%d')
         return (estropada, data_text , lekua)
+
     def parse_tandas(self, document):
         '''Parse race's paces tables'''
         tandas = document.find_class('tabla_tanda')

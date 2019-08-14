@@ -15,11 +15,9 @@ class EuskotrenParser(Parser):
         '''Parse a result and return an estropada object'''
         urla = args[0]
         document = self.get_content(*args)
-        (estropadaName, estropadaDate) = self.parse_headings(document)
-        opts = {'urla': urla}
+        (estropadaName, estropadaDate, lekua) = self.parse_headings(document)
+        opts = {'urla': urla, 'lekua': lekua, 'data': estropadaDate, 'liga': 'euskotren'}
         self.estropada = Estropada(estropadaName, **opts)
-        self.estropada.data = datetime.datetime.strftime(estropadaDate, '%Y-%m-%d')
-        self.estropada.liga = 'euskotren'
         self.parse_tandas(document)
         self.parse_resume(document)
         return self.estropada
@@ -37,7 +35,16 @@ class EuskotrenParser(Parser):
                     data = datetime.datetime.strptime(t, '%Y-%m-%d')
                 except ValueError:
                     estropada = estropada + t
-        return (estropada, data)
+        heading_table = document.cssselect('table[summary="Regata Puntuable"] td')
+        lekua = ''
+        if heading_table:
+            lekua = heading_table[1].text.strip()
+            ordua = re.split('[.:]', heading_table[3].text.strip())
+            data_ordua = data.replace(hour=int(ordua[0], 10), minute=int(ordua[1], 10))
+            data_text = data_ordua.strftime('%Y-%m-%d %H:%M')
+        else:
+            data_text = data_ordua.strftime('%Y-%m-%d')
+        return (estropada, data_text , lekua)
 
     def parse_tandas(self, document):
         numberOfHeats = document.find_class('tabla_tanda')
