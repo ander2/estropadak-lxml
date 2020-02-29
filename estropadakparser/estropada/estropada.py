@@ -15,6 +15,7 @@ class Estropada(object):
 
     def __init__(self, izena, **kwargs):
         self.__izena = izena
+        self.__kategoriak = []
         for key in kwargs.keys():
             setattr(self, key, kwargs[key])
         self.version = sys.version_info[1]
@@ -89,6 +90,14 @@ class Estropada(object):
     def urla(self, data):
         self.__urla = data
 
+    @property
+    def kategoriak(self):
+        return self.__kategoriak
+
+    @kategoriak.setter
+    def kategoriak(self, data):
+        self.__kategoriak = data
+
     def dump_text(self):
         print(self.__izena)
         print('{0:^6}\t{1:^5}\t{2:^5}\t{3:^30}\t{4:^25}\t{5:^8}'.format(
@@ -108,13 +117,13 @@ class Estropada(object):
                           cls=Encoder, indent=4)
 
     def format_for_json(self, o):
-        attrs = ['id', 'izena', 'data', 'liga', 'urla', 'lekua', 'oharrak']
+        attrs = ['id', 'izena', 'data', 'liga', 'urla', 'lekua', 'oharrak', 'kategoriak']
         obj = {}
         for at in attrs:
             if hasattr(o, at):
                 obj[at] = getattr(o, at)
         if hasattr(o, 'sailkapena'):
-            obj['sailkapena'] = [sailk.format_for_json() for sailk in sorted(o.sailkapena)]
+            obj['sailkapena'] = [sailk.format_for_json(sailk) for sailk in sorted(o.sailkapena)]
         return obj
 
 
@@ -184,14 +193,22 @@ class TaldeEmaitza(object):
     def puntuazioa(self, puntuazioa):
         self.__puntuazioa = puntuazioa
 
+    @property
+    def kategoria(self):
+        return self.__kategoria
+
+    @kategoria.setter
+    def kategoria(self, kategoria):
+        self.__kategoria = kategoria
+
     def ziaboga_gehitu(self, ziaboga):
         self.ziabogak.append(ziaboga)
 
     def __repr__(self):
-        return '[{:2}] {:1} {:1} {:1} {:30} {:25} {:8}'.format(
+        return '[{:2}] {:1} {:1} {:1} {:30} {:25} {:8} {:12}'.format(
                   self.posizioa, self.tanda, self.kalea, self.tanda_postua,
                   self.talde_izena, ' '.join(self.ziabogak),
-                  self.denbora)
+                  self.denbora, self.kategoria)
 
     def __gt__(self, other):
         return self.posizioa > other.posizioa
@@ -199,8 +216,8 @@ class TaldeEmaitza(object):
     def __lt__(self, other):
         return self.posizioa < other.posizioa
 
-    def format_for_json(self):
-        return { 
+    def format_for_json(self, tanda):
+        tanda_obj = {
             "talde_izena": self.talde_izena,
             "kalea": self.kalea,
             "tanda": self.tanda,
@@ -210,3 +227,6 @@ class TaldeEmaitza(object):
             "posizioa": self.posizioa,
             "puntuazioa": self.puntuazioa,
         }
+        if hasattr(tanda, 'kategoria'):
+            tanda_obj['kategoria'] = tanda.kategoria
+        return tanda_obj
