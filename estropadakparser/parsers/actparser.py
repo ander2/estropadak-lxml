@@ -61,7 +61,7 @@ class ActParser(Parser):
                 emaitza = TaldeEmaitza(talde_izena=data[1].strip(),
                                        kalea=kalea, ziabogak=data[2:5],
                                        denbora=data[5], tanda=num + 1,
-                                       tanda_postua=data[6], posizioa=0)
+                                       tanda_postua=int(data[6]), posizioa=0)
                 self.estropada.taldeak_add(emaitza)
 
     def parse_resume(self, document):

@@ -64,7 +64,7 @@ class EuskotrenParser(Parser):
                                               kalea=int(resultData[0]),
                                               ziabogak=ziabogak,
                                               denbora=denbora, tanda=num + 1,
-                                              tanda_postua=resultData[6],
+                                              tanda_postua=int(resultData[6]),
                                               posizioa=0)
                     self.estropada.taldeak_add(teamResult)
 
