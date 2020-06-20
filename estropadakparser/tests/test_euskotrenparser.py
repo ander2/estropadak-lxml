@@ -6,7 +6,7 @@ def test_euskotren_emaitzak_parser():
                         'ver.php?id=eu&r=1395519778')
     euskotrenParser = EuskotrenParser()
     estropada = euskotrenParser.parse(euskotren_url)
-    assert str(estropada) == 'V Bandera Marina de Cudeyo (2014-07-12)'
+    assert str(estropada) == 'V Bandera Marina de Cudeyo (2014-07-12 16:30)'
     assert estropada.urla == euskotren_url
     talde_kopurua = len(estropada.sailkapena)
     for taldea in estropada.sailkapena:
