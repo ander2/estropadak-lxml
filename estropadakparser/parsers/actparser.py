@@ -35,9 +35,12 @@ class ActParser(Parser):
             estropada = name.split('(')[0].strip()
             quoted_text = re.findall('\(([^\)]+)', name)
             for t in quoted_text:
-                try:
-                    data = datetime.datetime.strptime(t, '%Y-%m-%d')
-                except ValueError:
+                for data_format in ['%Y-%m-%d', '%d-%m-%Y']:
+                    try:
+                        data = datetime.datetime.strptime(t, data_format)
+                    except ValueError:
+                        pass
+                if data == '':
                     estropada = estropada + t
         heading_table = document.cssselect('table[summary="Regata Puntuable"] td')
         lekua = ''
