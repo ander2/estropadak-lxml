@@ -1,8 +1,8 @@
 import datetime
 import logging
 import re
-from .parser import Parser
-from ..estropada.estropada import Estropada, TaldeEmaitza
+from estropadakparser.parsers.parser import Parser
+from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
 
 class ArcParserLegacy(Parser):

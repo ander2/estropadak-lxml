@@ -1,7 +1,7 @@
 import datetime
 import re
-from .parser import Parser
-from ..estropada.estropada import Estropada, TaldeEmaitza
+from estropadakparser.parsers.parser import Parser
+from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
 class ActParser(Parser):
     '''Base class to parse an ACT race result'''
@@ -50,7 +50,7 @@ class ActParser(Parser):
             data_ordua = data.replace(hour=int(ordua[0], 10), minute=int(ordua[1], 10))
             data_text = data_ordua.strftime('%Y-%m-%d %H:%M')
         else:
-            data_text = data_ordua.strftime('%Y-%m-%d')
+            data_text = data.strftime('%Y-%m-%d')
         return (estropada, data_text , lekua)
 
     def parse_tandas(self, document):
