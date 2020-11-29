@@ -1,7 +1,7 @@
 import datetime
 import re
-from .parser import Parser
-from ..estropada.estropada import Estropada, TaldeEmaitza
+from estropadakparser.parsers.parser import Parser
+from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
 class ActParser(Parser):
     '''Base class to parse an ACT race result'''
@@ -35,9 +35,12 @@ class ActParser(Parser):
             estropada = name.split('(')[0].strip()
             quoted_text = re.findall('\(([^\)]+)', name)
             for t in quoted_text:
-                try:
-                    data = datetime.datetime.strptime(t, '%Y-%m-%d')
-                except ValueError:
+                for data_format in ['%Y-%m-%d', '%d-%m-%Y']:
+                    try:
+                        data = datetime.datetime.strptime(t, data_format)
+                    except ValueError:
+                        pass
+                if data == '':
                     estropada = estropada + t
         heading_table = document.cssselect('table[summary="Regata Puntuable"] td')
         lekua = ''
@@ -47,7 +50,7 @@ class ActParser(Parser):
             data_ordua = data.replace(hour=int(ordua[0], 10), minute=int(ordua[1], 10))
             data_text = data_ordua.strftime('%Y-%m-%d %H:%M')
         else:
-            data_text = data_ordua.strftime('%Y-%m-%d')
+            data_text = data.strftime('%Y-%m-%d')
         return (estropada, data_text , lekua)
 
     def parse_tandas(self, document):

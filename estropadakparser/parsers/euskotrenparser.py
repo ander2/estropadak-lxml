@@ -1,8 +1,8 @@
 import datetime
 import logging
 import re
-from .parser import Parser
-from ..estropada.estropada import Estropada, TaldeEmaitza
+from estropadakparser.parsers.parser import Parser
+from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
 
 class EuskotrenParser(Parser):
@@ -31,10 +31,13 @@ class EuskotrenParser(Parser):
             estropada = name.split('(')[0].strip()
             quoted_text = re.findall('\(([^\)]+)', name)
             for t in quoted_text:
-                try:
-                    data = datetime.datetime.strptime(t, '%Y-%m-%d')
-                except ValueError:
-                    estropada = estropada + t
+                for data_format in ['%Y-%m-%d', '%d-%m-%Y']:
+                    try:
+                        data = datetime.datetime.strptime(t, '%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    if data == '':
+                        estropada = estropada + t
         heading_table = document.cssselect('table[summary="Regata Puntuable"] td')
         lekua = ''
         if heading_table:
