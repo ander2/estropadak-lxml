@@ -45,10 +45,12 @@ class Estropada(object):
     def sailkapena(self, sailkapena):
         self.__sailkapena = []
         for taldea in sailkapena:
-            izena = taldea['talde_izena']
-            del taldea['talde_izena']
-            emaitza = TaldeEmaitza(izena, **taldea)
-            self.__sailkapena.append(emaitza)
+            if type(taldea) != TaldeEmaitza:
+                izena = taldea.pop('talde_izena')
+                emaitza = TaldeEmaitza(izena, **taldea)
+                self.__sailkapena.append(emaitza)
+            else:
+                self.__sailkapena.append(taldea)
 
     def taldeak_add(self, taldea):
         if not hasattr(self, 'sailkapena'):
