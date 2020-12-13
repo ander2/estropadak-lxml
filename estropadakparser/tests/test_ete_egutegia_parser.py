@@ -8,5 +8,5 @@ def test_ete_egutegia_parser():
         assert len(estropadak) == 14
         assert estropadak[0].izena == 'I. BANDERA ETE - PORTUGALETE'
         assert estropadak[0].data == '2018-06-17'
-        assert estropadak[13].izena == 'COLINDRES'
+        assert estropadak[13].izena == 'III BANDERA FEMENINA DE TRAINERAS AYUNTAMIENTO DE COLINDRES'
         assert estropadak[13].data == '2018-08-25'
