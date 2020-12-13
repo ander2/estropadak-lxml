@@ -1,5 +1,5 @@
 import lxml.html
-from ..estropada.estropada import Estropada
+from estropadakparser.estropada.estropada import Estropada
 
 
 class ActEgutegiaParser(object):
@@ -25,8 +25,7 @@ class ActEgutegiaParser(object):
             lekua = lek_data[0].text.strip()
             data = lek_data[1].text.strip()
             urla = self.base_url + link
-            opts = { 'urla': urla, 'data': data, 'lekua': lekua, 'liga': self.liga, 'sailkapena': []}
+            opts = {'urla': urla, 'data': data, 'lekua': lekua, 'liga': self.liga, 'sailkapena': []}
             estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak
-
