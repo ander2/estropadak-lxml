@@ -16,6 +16,7 @@ class Estropada(object):
     def __init__(self, izena, **kwargs):
         self.__izena = izena
         self.__kategoriak = []
+        self.__puntuagarria = True
         for key in kwargs.keys():
             setattr(self, key, kwargs[key])
         self.version = sys.version_info[1]
@@ -104,6 +105,14 @@ class Estropada(object):
     @kategoriak.setter
     def kategoriak(self, data):
         self.__kategoriak = data
+
+    @property
+    def puntuagarria(self):
+        return self.__puntuagarria
+
+    @puntuagarria.setter
+    def puntuagarria(self, data):
+        self.__puntuagarria = data
 
     def dump_text(self):
         print(self.__izena)
