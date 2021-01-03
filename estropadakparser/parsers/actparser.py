@@ -40,10 +40,14 @@ class ActParser(Parser):
         puntuagarria = True
         if len(heading_three) > 0:
             name = heading_three[0].text.strip()
-            puntuagarria_block = document.cssselect('p span.clase3')
+            puntuagarria_block = document.cssselect('p span.clase3, p span.clase1')
             if len(puntuagarria_block) > 0:
                 puntuagarria_text = puntuagarria_block[0].text.strip().lower()
                 puntuagarria = False if puntuagarria_text.startswith(('ez', 'no',)) else True
+            puntuagarria_block = document.cssselect('p span.clase2')
+            if len(puntuagarria_block) > 0:
+                puntuagarria_text = puntuagarria_block[0].text.strip().lower()
+                puntuagarria = False if puntuagarria_text.startswith('play') else True
             estropada = name.split('(')[0].strip()
             quoted_text = re.findall('\(([^\)]+)', name)
             for t in quoted_text:
