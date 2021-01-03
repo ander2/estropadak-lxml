@@ -16,6 +16,7 @@ class Estropada(object):
     def __init__(self, izena, **kwargs):
         self.__izena = izena
         self.__kategoriak = []
+        self.__puntuagarria = True
         for key in kwargs.keys():
             setattr(self, key, kwargs[key])
         self.version = sys.version_info[1]
@@ -45,10 +46,12 @@ class Estropada(object):
     def sailkapena(self, sailkapena):
         self.__sailkapena = []
         for taldea in sailkapena:
-            izena = taldea['talde_izena']
-            del taldea['talde_izena']
-            emaitza = TaldeEmaitza(izena, **taldea)
-            self.__sailkapena.append(emaitza)
+            if type(taldea) != TaldeEmaitza:
+                izena = taldea.pop('talde_izena')
+                emaitza = TaldeEmaitza(izena, **taldea)
+                self.__sailkapena.append(emaitza)
+            else:
+                self.__sailkapena.append(taldea)
 
     def taldeak_add(self, taldea):
         if not hasattr(self, 'sailkapena'):
@@ -103,6 +106,14 @@ class Estropada(object):
     def kategoriak(self, data):
         self.__kategoriak = data
 
+    @property
+    def puntuagarria(self):
+        return self.__puntuagarria
+
+    @puntuagarria.setter
+    def puntuagarria(self, data):
+        self.__puntuagarria = data
+
     def dump_text(self):
         print(self.__izena)
         print('{0:^6}\t{1:^5}\t{2:^5}\t{3:^30}\t{4:^25}\t{5:^8}'.format(
@@ -152,7 +163,10 @@ class TaldeEmaitza(object):
 
     @property
     def kalea(self):
-        return self.__kalea
+        try:
+            return self.__kalea
+        except AttributeError:
+            return None
 
     @kalea.setter
     def kalea(self, kalea):
@@ -160,7 +174,10 @@ class TaldeEmaitza(object):
 
     @property
     def tanda(self):
-        return self.__tanda
+        try:
+            return self.__tanda
+        except AttributeError:
+            return None
 
     @tanda.setter
     def tanda(self, tanda):
@@ -168,7 +185,10 @@ class TaldeEmaitza(object):
 
     @property
     def tanda_postua(self):
-        return self.__tanda_postua
+        try:
+            return self.__tanda_postua
+        except AttributeError:
+            return None
 
     @tanda_postua.setter
     def tanda_postua(self, tanda_postua):
@@ -176,7 +196,10 @@ class TaldeEmaitza(object):
 
     @property
     def denbora(self):
-        return self.__denbora
+        try:
+            return self.__denbora
+        except AttributeError:
+            return None
 
     @denbora.setter
     def denbora(self, denbora):
@@ -184,7 +207,10 @@ class TaldeEmaitza(object):
 
     @property
     def posizioa(self):
-        return self.__posizioa
+        try:
+            return self.__posizioa
+        except AttributeError:
+            return None
 
     @posizioa.setter
     def posizioa(self, posizioa):
@@ -192,7 +218,10 @@ class TaldeEmaitza(object):
 
     @property
     def puntuazioa(self):
-        return self.__puntuazioa
+        try:
+            return self.__puntuazioa
+        except AttributeError:
+            return None
 
     @puntuazioa.setter
     def puntuazioa(self, puntuazioa):
@@ -200,7 +229,10 @@ class TaldeEmaitza(object):
 
     @property
     def kategoria(self):
-        return self.__kategoria
+        try:
+            return self.__kategoria
+        except AttributeError:
+            return None
 
     @kategoria.setter
     def kategoria(self, kategoria):
@@ -210,10 +242,29 @@ class TaldeEmaitza(object):
         self.ziabogak.append(ziaboga)
 
     def __repr__(self):
-        return '[{:2}] {:1} {:1} {:1} {:30} {:25} {:8} {:12}'.format(
-                  self.posizioa, self.tanda, self.kalea, self.tanda_postua,
-                  self.talde_izena, ' '.join(self.ziabogak),
-                  self.denbora, self.kategoria)
+        formatua = ''
+        args = []
+        if getattr(self, 'posizioa'):
+            formatua = formatua + '[{:2}]'
+            args.append(getattr(self, 'posizioa'))
+        
+        for t in ['tanda', 'kalea', 'tanda_postua']:
+            if getattr(self, t):
+                formatua = formatua + '{:1}'
+                args.append(getattr(self, t))
+
+        formatua = formatua + '{:30}'
+        args.append(getattr(self, 'talde_izena'))
+
+        if getattr(self, 'ziabogak'):
+            formatua = formatua + '{:25}'
+            args.append(' '.join(self.ziabogak))
+
+        if getattr(self, 'denbora'):
+            formatua = formatua + '{:8}'
+            args.append(getattr(self, 'denbora'))
+
+        return formatua.format(*args)
 
     def __gt__(self, other):
         return self.posizioa > other.posizioa
