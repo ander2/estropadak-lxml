@@ -1,6 +1,7 @@
 import re
 from estropadakparser.parsers.actparser import ActParser
 
+
 def test_parse_act():
     act_url = ('http://www.ligasanmiguel.com/resultados/'
                 'ver.php?id=eu&r=1365765288')
@@ -22,6 +23,7 @@ def test_parse_act():
         for ziab in taldea.ziabogak:
             assert re.match('\d{2}:\d{2}', ziab) is not None
         assert re.match('\d{2}:\d{2},\d{2}', taldea.denbora) is not None
+
 
 def test_parse_act_without_sailkapena():
     act_url = ('http://www.euskolabelliga.com/resultados'
@@ -47,3 +49,9 @@ def test_parse_act_without_sailkapena():
             assert re.match('\d{2}:\d{2}', ziab) is not None
         assert re.match('\d{2}:\d{2},\d{2}', taldea.denbora) is not None
 
+
+def test_parse_act_ez_puntuagarria():
+    act_url = ('https://www.euskolabelliga.com/resultados/ver.php?id=es&r=1110968398')
+    actParser = ActParser()
+    estropada = actParser.parse(act_url)
+    assert estropada.puntuagarria is False
