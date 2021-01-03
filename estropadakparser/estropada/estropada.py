@@ -133,7 +133,7 @@ class Estropada(object):
                           cls=Encoder, indent=4)
 
     def format_for_json(self, o):
-        attrs = ['id', 'izena', 'data', 'liga', 'urla', 'lekua', 'oharrak', 'kategoriak']
+        attrs = ['id', 'izena', 'data', 'liga', 'urla', 'lekua', 'oharrak', 'kategoriak', 'puntuagarria']
         obj = {}
         for at in attrs:
             if hasattr(o, at):
