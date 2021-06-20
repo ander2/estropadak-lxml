@@ -283,6 +283,6 @@ class TaldeEmaitza(object):
             "posizioa": self.posizioa,
             "puntuazioa": self.puntuazioa,
         }
-        if hasattr(tanda, 'kategoria'):
-            tanda_obj['kategoria'] = tanda.kategoria
+        if hasattr(self, 'kategoria') and self.kategoria:
+            tanda_obj['kategoria'] = self.kategoria
         return tanda_obj
