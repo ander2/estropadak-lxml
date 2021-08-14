@@ -77,10 +77,11 @@ class ActParser(Parser):
             for row in rows:
                 data = [x.text for x in row.findall('.//td')]
                 kalea = int(data[0])
-                emaitza = TaldeEmaitza(talde_izena=data[1].strip(),
-                                       kalea=kalea, ziabogak=data[2:5],
-                                       denbora=data[5], tanda=num + 1,
-                                       tanda_postua=int(data[6]), posizioa=0)
+                if data[1]:
+                    emaitza = TaldeEmaitza(talde_izena=data[1].strip(),
+                                           kalea=kalea, ziabogak=data[2:5],
+                                           denbora=data[5], tanda=num + 1,
+                                           tanda_postua=int(data[6]), posizioa=0)
                 self.estropada.taldeak_add(emaitza)
 
     def parse_resume(self, document):
