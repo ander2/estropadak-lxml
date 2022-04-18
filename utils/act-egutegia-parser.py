@@ -35,5 +35,4 @@ for estropada in estropadak:
             'Authorization': f'JWT {token}',
             'Content-Type': 'application/json'
         })
-    # print(payload)
     print(f'{r.status_code}\t{r.text}')
