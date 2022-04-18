@@ -9,6 +9,6 @@ class EuskotrenEgutegiaParser(ActEgutegiaParser):
     def __init__(self):
         self.document = ''
         self.estropada = None
-        self.base_url = 'http://www.ligaeuskotren.com'
+        self.base_url = 'http://www.euskotrenliga.com'
         self.liga = 'euskotren'
 
