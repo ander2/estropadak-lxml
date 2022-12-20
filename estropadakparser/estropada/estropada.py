@@ -267,10 +267,20 @@ class TaldeEmaitza(object):
         return formatua.format(*args)
 
     def __gt__(self, other):
-        return self.posizioa > other.posizioa
+        if self.posizioa is None:
+            return True
+        elif other.posizioa is None:
+            return False
+        else:
+            return self.posizioa > other.posizioa
 
     def __lt__(self, other):
-        return self.posizioa < other.posizioa
+        if self.posizioa is None:
+            return False
+        elif other.posizioa is None:
+            return True
+        else:
+            return self.posizioa < other.posizioa
 
     def format_for_json(self, tanda):
         tanda_obj = {
