@@ -1,25 +1,12 @@
-import pytest
-import urllib.request
 import re
 from estropadakparser.estropadakparser import EstropadakParser
 from estropadakparser.parsers.actparser import ActParser
-from estropadakparser.estropada.estropada import Estropada
 
-#    '''Test class for testing EstropadakParser class'''
-#    def setUp(self):
-#        arc1_url = ('http://www.liga-arc.com/es/regata/163/'
-#                    'xxiii-bandera-ayuntamiento-de-camargo')
-#        arc2_url = ('http://www.liga-arc.com/es/regata/172/'
-#                    'xli-bandera-ciudad-de-castro-vi-mem.-avelino-ibaez')
-#        arc2RaceResult = urllib.request.urlopen(arc2_url)
-#        self.arc2RaceHtml = arc2RaceResult.read()
-#        euskotren_url = ('http://www.ligasanmiguel.com/femenina/resultados/'
-#                         'ver.php?id=es&r=1395519778')
-#        euskotrenRaceResult = urllib.request.urlopen(euskotren_url)
-#        self.euskotrenRaceHtml = euskotrenRaceResult.read()
+base_url = 'http://www.euskolabelliga.com'
+
 
 def test_register_parser():
-    act_url = ('http://www.ligasanmiguel.com/resultados/'
+    act_url = (f'{base_url}/resultados/'
                 'ver.php?id=eu&r=1365765288')
     EstropadakParser.register('actt', ActParser)
     parser = EstropadakParser('actt')

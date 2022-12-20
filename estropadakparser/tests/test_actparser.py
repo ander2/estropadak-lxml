@@ -1,10 +1,12 @@
 import re
 from estropadakparser.parsers.actparser import ActParser
 
+base_url = 'http://www.euskolabelliga.com'
+
 
 def test_parse_act():
-    act_url = ('http://www.ligasanmiguel.com/resultados/'
-                'ver.php?id=eu&r=1365765288')
+    act_url = (f'{base_url}/resultados/'
+               'ver.php?id=eu&r=1365765288')
     actParser = ActParser()
     estropada = actParser.parse(act_url)
     assert str(estropada) == 'Bandera Euskadi Basque Country (2013-06-16 12:00)'
@@ -26,8 +28,8 @@ def test_parse_act():
 
 
 def test_parse_act_without_sailkapena():
-    act_url = ('http://www.euskolabelliga.com/resultados'
-                '/ver.php?id=eu&r=1521889449')
+    act_url = (f'{base_url}/resultados'
+               '/ver.php?id=eu&r=1521889449')
     actParser = ActParser()
     estropada = actParser.parse(act_url)
     assert str(estropada) == 'Orioko XXVIII. Estropadak - VI. Orio Kanpina Bandera (2018-07-22 11:45)'
