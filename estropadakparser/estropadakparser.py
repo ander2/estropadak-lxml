@@ -15,7 +15,7 @@ from estropadakparser.parsers.eteparser import EteParser
 from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
 
-class EstropadakParser(object):
+class EstropadakParser():
     '''Factory class that returns the right parser
     based on the league name '''
     parsers = {
@@ -28,7 +28,8 @@ class EstropadakParser(object):
 
     def __new__(cls, league):
         try:
-            return cls.parsers[league]()
+            league = league.lower()
+            return object.__new__(cls.parsers[league])
         except KeyError:
             raise RuntimeError('Not registered parser. Available parsers: act, arc1, arc2, ete, euskotren')
         
