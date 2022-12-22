@@ -1,0 +1,4 @@
+0.1.16 
+======
+- Fixed serialization when a race has a disqualified team.
+- Refactor the main factory.
