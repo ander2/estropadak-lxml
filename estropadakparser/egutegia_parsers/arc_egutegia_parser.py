@@ -26,8 +26,11 @@ class ArcEgutegiaParser(object):
         new_date = new_date.replace('Agosto', '08')
         new_date = new_date.replace('Septiembre', '09')
         date_list = re.split(' ', new_date)
+        eguna = date_list[0]
+        if len(eguna) < 2:
+            eguna = '0' + eguna
         if len(date_list) == 3:
-            new_date = date_list[2] + "-" + date_list[1] + "-" + date_list[0]
+            new_date = date_list[2] + "-" + date_list[1] + "-" + eguna
         return new_date
 
     def parse(self, content):

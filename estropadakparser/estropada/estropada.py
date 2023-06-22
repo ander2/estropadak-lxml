@@ -247,7 +247,7 @@ class TaldeEmaitza(object):
         if getattr(self, 'posizioa'):
             formatua = formatua + '[{:2}]'
             args.append(getattr(self, 'posizioa'))
-        
+
         for t in ['tanda', 'kalea', 'tanda_postua']:
             if getattr(self, t):
                 formatua = formatua + '{:1}'
