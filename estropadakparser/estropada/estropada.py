@@ -126,11 +126,11 @@ class Estropada(object):
 
     def dump_json(self):
         print(json.dumps(self, default=self.format_for_json,
-                         indent=4))
+                         ensure_ascii=False, indent=4))
 
     def get_json(self):
         return json.dumps(self, default=self.format_for_json,
-                          cls=Encoder, indent=4)
+                          ensure_ascii=False, cls=Encoder, indent=4)
 
     def format_for_json(self, o):
         attrs = ['id', 'izena', 'data', 'liga', 'urla', 'lekua', 'oharrak', 'kategoriak', 'puntuagarria']
