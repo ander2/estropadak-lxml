@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='EstropadakParser',
-    version='0.1.17',
+    version='0.1.18',
     description='Python module for parsing Estropadak',
     author='Ander Garmendia',
     author_email='kelertxiki@gmail.com',
