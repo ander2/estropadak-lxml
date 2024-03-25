@@ -9,7 +9,7 @@ def test_euskotren_egutegia_parser():
         assert len(estropadak) == 8
         assert estropadak[0].izena == 'V. Orio Kanpina Bandera'
         assert estropadak[0].lekua == 'Orio'
-        assert estropadak[0].data == '2017-07-08'
+        assert estropadak[0].data == '2017-07-08T00:00:00'
         assert estropadak[7].izena == 'Zarauzko IX Ikurriña J2'
         assert estropadak[7].lekua == 'Zarautz'
-        assert estropadak[7].data == '2017-08-20'
+        assert estropadak[7].data == '2017-08-20T00:00:00'

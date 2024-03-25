@@ -17,14 +17,14 @@ class EteEgutegiaParser(object):
         h1_sections = self.document.cssselect(selector)
         year = datetime.datetime.now().year
         if len(h1_sections) > 0:
-            year = h1_sections[0].text.strip()
+            year = int(h1_sections[0].text.strip())
         return year
 
     def parse_date(self, row):
         year = self.parse_year()
         data_html = row.cssselect('.fecha span')
         data_elements = data_html[0].text.strip().split()
-        day = data_elements[0]
+        day = int(data_elements[0])
         month = data_elements[1]
         month_num = '06'
         if month == 'Julio':
@@ -33,8 +33,9 @@ class EteEgutegiaParser(object):
             month_num = '08'
         elif month == 'Septiembre':
             month_num = '09'
-        date = year + "-" + month_num + "-" + day
-        return date
+        month_num = int(month_num)
+        date = datetime.datetime(year=year, month=month_num, day=day)
+        return date.isoformat()
 
     def parse(self, content):
         self.document = lxml.html.fromstring(content)
@@ -46,7 +47,11 @@ class EteEgutegiaParser(object):
             izena = anchor[0].text.strip()
             link = anchor[0].attrib['href']
             data = self.parse_date(row)
-            opts = { 'urla': link, 'data': data, 'liga': self.liga}
+            opts = { 
+                'urla': link,
+                'data': data,
+                'liga': self.liga
+            }
             estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak

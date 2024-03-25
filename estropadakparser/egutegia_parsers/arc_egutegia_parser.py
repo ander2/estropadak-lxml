@@ -17,21 +17,20 @@ class ArcEgutegiaParser(object):
         h1_sections = self.document.cssselect(selector)
         year = datetime.datetime.now().year
         if len(h1_sections) > 0:
-            year = h1_sections[0].text.strip()
+            year = int(h1_sections[0].text.strip())
         return year
 
     def parse_date(self, date):
+        year = self.parse_year()
         new_date = date.replace('Junio', '06')
         new_date = new_date.replace('Julio', '07')
         new_date = new_date.replace('Agosto', '08')
         new_date = new_date.replace('Septiembre', '09')
         date_list = re.split(' ', new_date)
-        eguna = date_list[0]
-        if len(eguna) < 2:
-            eguna = '0' + eguna
-        if len(date_list) == 3:
-            new_date = date_list[2] + "-" + date_list[1] + "-" + eguna
-        return new_date
+        day = int(date_list[0])
+        month = int(date_list[1])
+        date = datetime.datetime(year=year, month=month, day=day)
+        return date.isoformat()
 
     def parse(self, content):
         self.document = lxml.html.fromstring(content)
@@ -40,15 +39,18 @@ class ArcEgutegiaParser(object):
         else:
             selector = 'tr.tab-item.g2'
         estropadak = []
-        year = self.parse_year()
         table_rows = self.document.cssselect(selector)
         for row in table_rows:
             anchor = row.cssselect('a')
             izena = anchor[0].text.strip()
             link = anchor[0].attrib['href']
             lek_data = row.cssselect('.fecha span')
-            data = self.parse_date('{} {}'.format(lek_data[0].text.strip(),  year))
-            opts = { 'urla': link, 'data': data, 'liga': self.liga}
+            data = self.parse_date(lek_data[0].text.strip())
+            opts = {
+                'urla': link,
+                'data': data,
+                'liga': self.liga
+            }
             estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak

@@ -1,3 +1,4 @@
+import datetime
 import lxml.html
 from estropadakparser.estropada.estropada import Estropada
 
@@ -23,9 +24,15 @@ class ActEgutegiaParser(object):
             link = anchor[0].attrib['href']
             lek_data = row.cssselect('.place')
             lekua = lek_data[0].text.strip()
-            data = lek_data[1].text.strip()
+            data = datetime.datetime.strptime(lek_data[1].text.strip(), '%d-%m-%Y')
             urla = self.base_url + link
-            opts = {'urla': urla, 'data': data, 'lekua': lekua, 'liga': self.liga, 'sailkapena': []}
+            opts = {
+                'urla': urla,
+                'data': data.isoformat(),
+                'lekua': lekua,
+                'liga': self.liga,
+                'sailkapena': []
+            }
             estropada = Estropada(izena, **opts)
             estropadak.append(estropada)
         return estropadak
