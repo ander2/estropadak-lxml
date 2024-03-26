@@ -10,5 +10,4 @@ class EuskotrenEgutegiaParser(ActEgutegiaParser):
         self.document = ''
         self.estropada = None
         self.base_url = 'http://www.euskotrenliga.com'
-        self.liga = 'euskotren'
-
+        self.liga = 'EUSKOTREN'
