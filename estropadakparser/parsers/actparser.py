@@ -63,10 +63,9 @@ class ActParser(Parser):
         if heading_table:
             lekua = heading_table[1].text.strip()
             ordua = re.split('[.:]', heading_table[3].text.strip())
-            data_ordua = data.replace(hour=int(ordua[0], 10), minute=int(ordua[1], 10))
-            data_text = data_ordua.strftime('%Y-%m-%d %H:%M')
-        else:
-            data_text = data.strftime('%Y-%m-%d')
+            if len(ordua) > 1:
+                data = data.replace(hour=int(ordua[0], 10), minute=int(ordua[1], 10))
+        data_text = data.isoformat()
         return (estropada, data_text, lekua, puntuagarria)
 
     def parse_tandas(self, document):

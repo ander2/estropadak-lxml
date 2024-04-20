@@ -33,21 +33,20 @@ class EuskotrenParser(Parser):
             for t in quoted_text:
                 for data_format in ['%Y-%m-%d', '%d-%m-%Y']:
                     try:
-                        data = datetime.datetime.strptime(t, '%Y-%m-%d')
+                        data = datetime.datetime.strptime(t, data_format)
                     except ValueError:
                         pass
-                    if data == '':
-                        estropada = estropada + t
+                if data == '':
+                    estropada = estropada + t
         heading_table = document.cssselect('table[summary="Regata Puntuable"] td')
         lekua = ''
         if heading_table:
             lekua = heading_table[1].text.strip()
             ordua = re.split('[.:]', heading_table[3].text.strip())
-            data_ordua = data.replace(hour=int(ordua[0], 10), minute=int(ordua[1], 10))
-            data_text = data_ordua.strftime('%Y-%m-%d %H:%M')
-        else:
-            data_text = data_ordua.strftime('%Y-%m-%d')
-        return (estropada, data_text , lekua)
+            if len(ordua) > 1:
+                data = data.replace(hour=int(ordua[0], 10), minute=int(ordua[1], 10))
+        data_text = data.isoformat()
+        return (estropada, data_text, lekua)
 
     def parse_tandas(self, document):
         numberOfHeats = document.find_class('tabla_tanda')
