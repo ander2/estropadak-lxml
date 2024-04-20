@@ -1,6 +1,7 @@
 # coding=utf-8
-import sys
+import datetime
 import json
+import sys
 
 
 class Encoder(json.JSONEncoder):
@@ -28,7 +29,8 @@ class Estropada(object):
         return self.__data < other.__data
 
     def __repr__(self):
-        return '{} ({})'.format(self.izena, self.__data)
+        data = datetime.datetime.fromisoformat(self.__data)
+        return '{} ({})'.format(self.izena, data.strftime('%Y-%m-%d %H:%M'))
 
     @property
     def izena(self):
