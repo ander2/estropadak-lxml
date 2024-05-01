@@ -49,7 +49,7 @@ class ActParser(Parser):
                 puntuagarria_text = puntuagarria_block[0].text.strip().lower()
                 puntuagarria = False if puntuagarria_text.startswith('play') else True
             estropada = name.split('(')[0].strip()
-            quoted_text = re.findall('\(([^\)]+)', name)
+            quoted_text = re.findall(r'\(([^\)]+)', name)
             for t in quoted_text:
                 for data_format in ['%Y-%m-%d', '%d-%m-%Y']:
                     try:
@@ -89,7 +89,7 @@ class ActParser(Parser):
         try:
             sailkapena = document.xpath(rank_table)
             rows = sailkapena[-1].findall('.//tbody//tr')
-        except:
+        except Exception:
             rows = []
         for num, row in enumerate(rows):
             try:
@@ -104,7 +104,7 @@ class ActParser(Parser):
                         try:
                             self.estropada.sailkapena[i].posizioa = int(posizioa, 10)
                             self.estropada.sailkapena[i].puntuazioa = int(puntuak, 10)
-                        except:
-                            print(f'Ez dago posizio edo puntuazioarik {team} taldearentzat')
-            except:
+                        except Exception as e:
+                            print(f'Ez dago posizio edo puntuazioarik {team} taldearentzat: {e}')
+            except Exception:
                 return None

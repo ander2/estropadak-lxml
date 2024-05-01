@@ -41,7 +41,7 @@ class ArcParser(Parser):
         date = date_block[0].text_content().strip(" \n").replace('Fecha', '').strip(" \n")
         new_date = self.parse_date(date)
         hour = hour_block[0].text_content().replace('Hora', '').strip()
-        race_date = datetime.datetime.strptime(new_date + " " + hour, "%Y-%m-%d %H:%M")  # new_date + " " + hour
+        race_date = datetime.datetime.strptime(new_date + " " + hour, "%Y-%m-%d %H:%M")
         return (estropada, race_date.isoformat(), lekua, liga_taldea)
 
     def parse_date(self, date):
@@ -77,7 +77,7 @@ class ArcParser(Parser):
                 taldea = row.find('.//span//a').text.strip()
                 try:
                     puntuak = row.find('.//td[3]').text.strip()
-                except:
+                except Exception:
                     puntuak = 0
                 for t in self.estropada.sailkapena:
                     if t.talde_izena == taldea:
@@ -85,9 +85,8 @@ class ArcParser(Parser):
                             t.posizioa = pos + 1
                             t.tanda_postua = tanda_posizioak[t.tanda]
                             t.puntuazioa = int(puntuak)
-                        except:
+                        except Exception:
                             t.posizioa = 1
                             t.tanda_postua = tanda_posizioak[t.tanda]
                             t.puntuazioa = 0
                         tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
-
