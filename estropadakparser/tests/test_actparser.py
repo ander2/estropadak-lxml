@@ -11,6 +11,7 @@ def test_parse_act():
     estropada = actParser.parse(act_url)
     assert str(estropada) == 'Bandera Euskadi Basque Country (2013-06-16 12:00)'
     assert estropada.izena == 'Bandera Euskadi Basque Country'
+    assert estropada.data == '2013-06-16T12:00:00'
     assert len(estropada.sailkapena) == 12
     assert estropada.urla == act_url
     for taldea in estropada.sailkapena:

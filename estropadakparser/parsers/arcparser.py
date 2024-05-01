@@ -41,8 +41,8 @@ class ArcParser(Parser):
         date = date_block[0].text_content().strip(" \n").replace('Fecha', '').strip(" \n")
         new_date = self.parse_date(date)
         hour = hour_block[0].text_content().replace('Hora', '').strip()
-        race_date = new_date + " " + hour
-        return (estropada, race_date, lekua, liga_taldea)
+        race_date = datetime.datetime.strptime(new_date + " " + hour, "%Y-%m-%d %H:%M")  # new_date + " " + hour
+        return (estropada, race_date.isoformat(), lekua, liga_taldea)
 
     def parse_date(self, date):
         new_date = date.replace('Jun', '06')

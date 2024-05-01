@@ -1,6 +1,7 @@
 import re
 from estropadakparser.parsers.eteparser import EteParser
 
+
 def test_parse_ete():
     ete_url = ('https://www.ligaete.com/es/regata/'
                '356/emakumeen-i.-orio-kanpina-bandera')
@@ -8,6 +9,7 @@ def test_parse_ete():
     estropada = eteParser.parse(ete_url)
     assert str(estropada) == 'EMAKUMEEN I. ORIO KANPINA BANDERA (2018-07-21 11:00)'
     assert estropada.liga == 'ETE'
+    assert estropada.data == '2018-07-21T11:00:00'
     assert estropada.urla == ete_url
     talde_kopurua = len(estropada.sailkapena)
     for taldea in estropada.sailkapena:
