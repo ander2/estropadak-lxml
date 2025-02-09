@@ -2,7 +2,7 @@ appdirs==1.4.2
 cssselect==1.2.0
 lxml==4.9.1
 packaging==16.8
-py==1.10.0
+py==1.11.0
 pyparsing==2.1.10
 pytest==8.3.4
 six==1.10.0
