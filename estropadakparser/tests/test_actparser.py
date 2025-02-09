@@ -23,8 +23,8 @@ def test_parse_act():
         assert type(taldea.tanda) == int
         assert taldea.tanda in range(1, 4)
         for ziab in taldea.ziabogak:
-            assert re.match('\d{2}:\d{2}', ziab) is not None
-        assert re.match('\d{2}:\d{2},\d{2}', taldea.denbora) is not None
+            assert re.match(r'\d{2}:\d{2}', ziab) is not None
+        assert re.match(r'\d{2}:\d{2},\d{2}', taldea.denbora) is not None
 
 
 def test_parse_act_without_sailkapena():
@@ -48,8 +48,8 @@ def test_parse_act_without_sailkapena():
         assert type(taldea.tanda) == int
         assert taldea.tanda in range(1, 4)
         for ziab in taldea.ziabogak:
-            assert re.match('\d{2}:\d{2}', ziab) is not None
-        assert re.match('\d{2}:\d{2},\d{2}', taldea.denbora) is not None
+            assert re.match(r'\d{2}:\d{2}', ziab) is not None
+        assert re.match(r'\d{2}:\d{2},\d{2}', taldea.denbora) is not None
 
 
 def test_parse_act_ez_puntuagarria():
