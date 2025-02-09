@@ -1,5 +1,4 @@
 import datetime
-import logging
 import re
 from estropadakparser.parsers.parser import Parser
 from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
@@ -86,6 +85,6 @@ class EuskotrenParser(Parser):
                             try:
                                 t.posizioa = int(position)
                                 t.puntuazioa = int(puntuazioa)
-                            except:
-                                print("Errorea")
+                            except Exception as e:
+                                print(f"Errorea: {e}")
                                 t.posizioa = 1
