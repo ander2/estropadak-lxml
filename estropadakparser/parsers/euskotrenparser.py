@@ -29,7 +29,7 @@ class EuskotrenParser(Parser):
         if len(heading_three) > 0:
             name = heading_three[0].text.strip()
             estropada = name.split('(')[0].strip()
-            quoted_text = re.findall('\(([^\)]+)', name)
+            quoted_text = re.findall(r'\(([^\)]+)', name)
             for t in quoted_text:
                 for data_format in ['%Y-%m-%d', '%d-%m-%Y']:
                     try:

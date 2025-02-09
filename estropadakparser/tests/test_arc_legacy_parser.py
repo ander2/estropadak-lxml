@@ -18,5 +18,5 @@ def test_parse_arc_legacy():
         assert type(taldea.tanda) == int
         assert taldea.tanda in range(1, 4)
         for ziab in taldea.ziabogak:
-            assert re.match('\d{1,2}:\d{2}', ziab)
-        assert re.match('\d{2}:\d{2},\d{2}', taldea.denbora)
+            assert re.match(r'\d{1,2}:\d{2}', ziab)
+        assert re.match(r'\d{2}:\d{2},\d{2}', taldea.denbora)

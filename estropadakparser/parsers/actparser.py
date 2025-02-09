@@ -49,7 +49,7 @@ class ActParser(Parser):
                 puntuagarria_text = puntuagarria_block[0].text.strip().lower()
                 puntuagarria = False if puntuagarria_text.startswith('play') else True
             estropada = name.split('(')[0].strip()
-            quoted_text = re.findall('\(([^\)]+)', name)
+            quoted_text = re.findall(r'\(([^\)]+)', name)
             for t in quoted_text:
                 for data_format in ['%Y-%m-%d', '%d-%m-%Y']:
                     try:
