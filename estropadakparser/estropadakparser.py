@@ -1,18 +1,10 @@
 # coding=utf-8
-import lxml.html
-import re
-import logging
-import datetime
-import urllib.request
 import sys
-from estropadakparser.parsers.parser import Parser
 from estropadakparser.parsers.actparser import ActParser
 from estropadakparser.parsers.arcparser import ArcParser
 from estropadakparser.parsers.euskotrenparser import EuskotrenParser
 from estropadakparser.parsers.arc_legacy_parser import ArcParserLegacy
 from estropadakparser.parsers.eteparser import EteParser
-
-from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
 
 
 class EstropadakParser():
@@ -32,7 +24,7 @@ class EstropadakParser():
             return object.__new__(cls.parsers[league])
         except KeyError:
             raise RuntimeError('Not registered parser. Available parsers: act, arc1, arc2, ete, euskotren')
-        
+
 
     @classmethod
     def register(cls, league, parser):
@@ -44,7 +36,7 @@ if __name__ == "__main__":
     liga = sys.argv[1].lower()
     modua = sys.argv[2].lower()
     try:
-        liga_kod = liga 
+        liga_kod = liga
         if (liga == 'arc1' or liga == 'arc2'):
             liga_kod = 'arc'
         p = EstropadakParser(liga_kod)
@@ -55,4 +47,3 @@ if __name__ == "__main__":
             print(estropada.dump_text())
     except KeyError:
         raise RuntimeError('Not registered parser. Available parsers: act, arc1, arc2, ete, euskotren')
-    

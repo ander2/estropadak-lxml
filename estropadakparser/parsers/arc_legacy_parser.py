@@ -105,4 +105,4 @@ class ArcParserLegacy(Parser):
                         tanda_posizioak[t.tanda] = tanda_posizioak[t.tanda] + 1
             except Exception as e:
                 logging.warn(self.estropada.izena)
-                logging.info("Error parsing results", exec_info=True)
+                logging.info(f"Error parsing results: {e}", exec_info=True)

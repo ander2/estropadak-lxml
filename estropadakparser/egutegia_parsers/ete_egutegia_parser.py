@@ -1,5 +1,4 @@
 import datetime
-import re
 import lxml.html
 from ..estropada.estropada import Estropada
 
@@ -10,7 +9,7 @@ class EteEgutegiaParser(object):
     def __init__(self):
         self.document = ''
         self.estropada = None
-        self.liga = 'ETE' 
+        self.liga = 'ETE'
 
     def parse_year(self):
         selector = 'h1 span span'
@@ -47,7 +46,7 @@ class EteEgutegiaParser(object):
             izena = anchor[0].text.strip()
             link = anchor[0].attrib['href']
             data = self.parse_date(row)
-            opts = { 
+            opts = {
                 'urla': link,
                 'data': data,
                 'liga': self.liga

@@ -1,5 +1,4 @@
 import datetime
-import logging
 import re
 from estropadakparser.parsers.parser import Parser
 from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
@@ -29,7 +28,7 @@ class EuskotrenParser(Parser):
         if len(heading_three) > 0:
             name = heading_three[0].text.strip()
             estropada = name.split('(')[0].strip()
-            quoted_text = re.findall('\(([^\)]+)', name)
+            quoted_text = re.findall(r'\(([^\)]+)', name)
             for t in quoted_text:
                 for data_format in ['%Y-%m-%d', '%d-%m-%Y']:
                     try:
@@ -86,6 +85,6 @@ class EuskotrenParser(Parser):
                             try:
                                 t.posizioa = int(position)
                                 t.puntuazioa = int(puntuazioa)
-                            except:
-                                print("Errorea")
+                            except Exception as e:
+                                print(f"Errorea: {e}")
                                 t.posizioa = 1
