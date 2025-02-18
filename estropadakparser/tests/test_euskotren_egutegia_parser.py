@@ -2,7 +2,7 @@ from estropadakparser.egutegia_parsers.euskotren_egutegia_parser import Euskotre
 
 def test_euskotren_egutegia_parser():
     # http://www.euskolabelliga.com/femenina/calendario/index.php?id=es&t=2017
-    with open('./data/egutegia_euskotren_2017.html', encoding='iso-8859-1') as file:
+    with open('./estropadakparser/tests/data/egutegia_euskotren_2017.html', encoding='iso-8859-1') as file:
         content = file.read()
         parser = EuskotrenEgutegiaParser()
         estropadak = parser.parse(content)

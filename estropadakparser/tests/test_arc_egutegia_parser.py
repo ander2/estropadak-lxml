@@ -2,7 +2,7 @@ from estropadakparser.egutegia_parsers.arc_egutegia_parser import ArcEgutegiaPar
 
 
 def test_arc_egutegia_parser():
-    with open('./data/egutegia_arc_2022.html', encoding='utf-8') as file:
+    with open('./estropadakparser/tests/data/egutegia_arc_2022.html', encoding='utf-8') as file:
         content = file.read()
         parser = ArcEgutegiaParser('ARC1')
         estropadak = parser.parse(content)
