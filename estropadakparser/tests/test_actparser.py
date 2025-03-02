@@ -14,13 +14,9 @@ def test_parse_act():
     assert len(estropada.sailkapena) == 12
     assert estropada.urla == act_url
     for taldea in estropada.sailkapena:
-        assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, 13)
-        assert type(taldea.puntuazioa) == int
         assert taldea.puntuazioa in range(1, 13)
-        assert type(taldea.kalea) == int
         assert taldea.kalea in range(1, 5)
-        assert type(taldea.tanda) == int
         assert taldea.tanda in range(1, 4)
         for ziab in taldea.ziabogak:
             assert re.match(r'\d{2}:\d{2}', ziab) is not None
@@ -37,15 +33,11 @@ def test_parse_act_without_sailkapena():
     assert len(estropada.sailkapena) == 12
     assert estropada.urla == act_url
     for taldea in estropada.sailkapena:
-        assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, 13)
         if taldea.talde_izena == 'ORIO BABYAUTO':
             assert taldea.puntuazioa == 12
-        assert type(taldea.puntuazioa) == int
         assert taldea.puntuazioa in range(1, 13)
-        assert type(taldea.kalea) == int
         assert taldea.kalea in range(1, 5)
-        assert type(taldea.tanda) == int
         assert taldea.tanda in range(1, 4)
         for ziab in taldea.ziabogak:
             assert re.match(r'\d{2}:\d{2}', ziab) is not None

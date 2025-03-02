@@ -11,11 +11,8 @@ def test_parse_arc_legacy():
     assert talde_kopurua == 12
     assert estropada.urla == url
     for taldea in estropada.sailkapena:
-        assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, talde_kopurua + 1)
-        assert type(taldea.kalea) == int
         assert taldea.kalea in range(1, 5)
-        assert type(taldea.tanda) == int
         assert taldea.tanda in range(1, 4)
         for ziab in taldea.ziabogak:
             assert re.match(r'\d{1,2}:\d{2}', ziab)

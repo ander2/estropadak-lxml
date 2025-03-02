@@ -48,7 +48,7 @@ class Estropada(object):
     def sailkapena(self, sailkapena):
         self.__sailkapena = []
         for taldea in sailkapena:
-            if type(taldea) != TaldeEmaitza:
+            if not isinstance(taldea, TaldeEmaitza):
                 izena = taldea.pop('talde_izena')
                 emaitza = TaldeEmaitza(izena, **taldea)
                 self.__sailkapena.append(emaitza)

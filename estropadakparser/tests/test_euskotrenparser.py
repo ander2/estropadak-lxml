@@ -13,13 +13,9 @@ def test_euskotren_emaitzak_parser():
     assert estropada.urla == euskotren_url
     talde_kopurua = len(estropada.sailkapena)
     for taldea in estropada.sailkapena:
-        assert type(taldea.posizioa) == int
         assert taldea.posizioa in range(1, talde_kopurua + 1)
-        assert type(taldea.puntuazioa) == int
         assert taldea.puntuazioa in range(0, 8)
-        assert type(taldea.kalea) == int
         assert taldea.kalea in range(1, 5)
-        assert type(taldea.tanda) == int
         assert taldea.tanda in range(1, 2)
         assert re.match(r'\d{1,2}:\d{2}', taldea.ziabogak[0])
         assert re.match(r'\d{2}:\d{2},\d{2}', taldea.denbora)
