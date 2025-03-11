@@ -58,6 +58,6 @@ Postua	Tanda	Kalea	            Taldea            	        Ziabogak         	Denb
 
 # Contact / Harremana
 
-You can contact me on Twitter (@estropadak) 
+You can contact me by e-mail info at estropadak.eus
 
-Twitter bidez kontaktatu nazakezue (@estropadak)
+E-mail bidez kontaktatu nazakezue info abildua estropadak.eus
