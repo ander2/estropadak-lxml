@@ -2,7 +2,7 @@ from estropadakparser.egutegia_parsers.ete_egutegia_parser import EteEgutegiaPar
 
 
 def test_ete_egutegia_parser():
-    with open('./data/egutegia_ete_2018.html', encoding='utf-8') as file:
+    with open('./estropadakparser/tests/data/egutegia_ete_2018.html', encoding='utf-8') as file:
         content = file.read()
         parser = EteEgutegiaParser()
         estropadak = parser.parse(content)

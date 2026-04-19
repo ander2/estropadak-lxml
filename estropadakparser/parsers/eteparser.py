@@ -1,4 +1,3 @@
-import datetime
 import re
 from estropadakparser.parsers.parser import Parser
 from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
@@ -74,7 +73,7 @@ class EteParser(Parser):
                 taldea = row.find('.//span//a').text.strip()
                 try:
                     puntuak = row.find('.//td[3]').text.strip()
-                except:
+                except Exception:
                     puntuak = 0
                 for t in self.estropada.sailkapena:
                     if t.talde_izena == taldea:
@@ -82,7 +81,7 @@ class EteParser(Parser):
                             t.posizioa = pos + 1
                             t.tanda_postua = tanda_posizioak[t.tanda]
                             t.puntuazioa = int(puntuak)
-                        except:
+                        except Exception:
                             t.posizioa = 1
                             t.tanda_postua = tanda_posizioak[t.tanda]
                             t.puntuazioa = 0

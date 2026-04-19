@@ -5,7 +5,7 @@ from estropadakparser.estropada.estropada import TaldeEmaitza
 def test_talde_emaitza():
     izena = 'Donostiarra'
     te = TaldeEmaitza(izena)
-    assert type(te) == TaldeEmaitza
+    assert isinstance(te, TaldeEmaitza)
     assert te.talde_izena == izena
 
 

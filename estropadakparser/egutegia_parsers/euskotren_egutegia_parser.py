@@ -1,5 +1,3 @@
-import lxml.html
-from ..estropada.estropada import Estropada
 from .act_egutegia_parser import ActEgutegiaParser
 
 
