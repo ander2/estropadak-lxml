@@ -1,3 +1,4 @@
+import datetime
 import re
 from estropadakparser.parsers.parser import Parser
 from estropadakparser.estropada.estropada import Estropada, TaldeEmaitza
