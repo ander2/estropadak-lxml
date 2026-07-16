@@ -85,9 +85,9 @@ class ActParser(Parser):
 
     def parse_resume(self, document):
         '''Parse race's resume table'''
-        rank_table = '//table[@summary="Estropadaren sailkapena"]'
         try:
-            sailkapena = document.xpath(rank_table)
+            rank_table = 'h3.clasificacion + .fondo_taula > .taula'
+            sailkapena = document.cssselect(rank_table)
             rows = sailkapena[-1].findall('.//tbody//tr')
         except Exception:
             rows = []

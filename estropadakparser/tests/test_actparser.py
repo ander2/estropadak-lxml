@@ -6,14 +6,16 @@ base_url = 'http://www.euskolabelliga.com'
 
 def test_parse_act():
     act_url = (f'{base_url}/resultados/'
-               'ver.php?id=eu&r=1365765288')
+               'ver.php?id=es&r=1365765288')
     actParser = ActParser()
-    estropada = actParser.parse(act_url)
+    with open("./estropadakparser/tests/data/2023-06-16_ACT_Bandera_Basque_Country.html") as f:
+        basque_country_bandera = f.read()
+    estropada = actParser.parse(None, basque_country_bandera)
     assert str(estropada) == 'Bandera Euskadi Basque Country (2013-06-16 12:00)'
     assert estropada.izena == 'Bandera Euskadi Basque Country'
     assert estropada.data == '2013-06-16T12:00:00'
     assert len(estropada.sailkapena) == 12
-    assert estropada.urla == act_url
+    # assert estropada.urla == act_url
     for taldea in estropada.sailkapena:
         assert taldea.posizioa in range(1, 13)
         assert taldea.puntuazioa in range(1, 13)
